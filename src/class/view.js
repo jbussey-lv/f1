@@ -6,6 +6,7 @@ export class View{
     constructor(world, svg){
         this.world = world;
         this.svg = svg;
+        this.animate();
     }
 
     get pixelCenterCoords() {
@@ -13,6 +14,11 @@ export class View{
             this.widthInPixels / 2,
             this.heightInPixels / 2
         );
+    }
+
+    animate(){
+        this.draw();
+        requestAnimationFrame(() => this.animate());
     }
 
     draw() {
@@ -23,11 +29,12 @@ export class View{
         });
     }
 
-    drawRectangleInMeters(positionInMeters, comInMeters, widthInMeters, lengthInMeters, fillColor="blue") {
+    drawRectangleInMeters(positionInMeters, comInMeters, angleInDegrees, widthInMeters, lengthInMeters, fillColor="blue") {
         const positionInPixels = this.meterCoordsToPixelCoords(positionInMeters);
         this.drawRectangleInPixels(
-            positionInPixels.x - (comInMeters.x * this.pixelsPerMeter),
-            positionInPixels.y - (comInMeters.y * this.pixelsPerMeter),
+            positionInPixels,
+            comInMeters.clone().multiplyScalar(this.pixelsPerMeter),
+            angleInDegrees,
             lengthInMeters * this.pixelsPerMeter,
             widthInMeters * this.pixelsPerMeter,
             fillColor
@@ -49,13 +56,14 @@ export class View{
         this.svg.appendChild(circle);
     }
 
-    drawRectangleInPixels(xInPixels, yInPixels, widthInPixels, heightInPixels, fillColor){
+    drawRectangleInPixels(positionInPixels, comInPixelsxInPixels, angleInDegrees, widthInPixels, heightInPixels, fillColor){
         const rect = document.createElementNS(svgNamespace, "rect");
-        rect.setAttribute("x", xInPixels);
-        rect.setAttribute("y", yInPixels);
+        rect.setAttribute("x", positionInPixels.x - comInPixelsxInPixels.x);
+        rect.setAttribute("y", positionInPixels.y - comInPixelsxInPixels.y);
         rect.setAttribute("width", widthInPixels);
         rect.setAttribute("height", heightInPixels);
         rect.setAttribute("fill", fillColor);
+        rect.setAttribute("transform", `rotate(${angleInDegrees} ${positionInPixels.x} ${positionInPixels.y})`);
         this.svg.appendChild(rect);
     }
 
@@ -192,6 +200,7 @@ export class View{
         this.drawRectangleInMeters(
             car.position,
             car.com,
+            car.angleInDegrees,
             car.width,
             car.length,
             car.color);
