@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple application to display rectangles on an SVG canvas.",
   "main": "src/app.js",
+  "type": "module",
   "scripts": {
     "start": "live-server src"
   },
