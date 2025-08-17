@@ -2,7 +2,7 @@ export class Car{
     position = new Victor(10, 20);
     velocity = new Victor(0, 0);
     angle = 0; // in radians
-    angulerVelocity = 5 * Math.PI / 180; // in radians per second
+    angulerVelocity = 90 * Math.PI / 180; // in radians per second
     width = 5; // in meters
     length = 10; // in meters
     mass = 1500; // in kg
