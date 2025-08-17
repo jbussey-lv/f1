@@ -18,7 +18,7 @@ export class View{
 
     animate(){
         this.draw();
-        requestAnimationFrame(() => this.animate());
+        // requestAnimationFrame(() => this.animate());
     }
 
     draw() {
@@ -29,41 +29,49 @@ export class View{
         });
     }
 
-    drawRectangleInMeters(positionInMeters, comInMeters, angleInDegrees, widthInMeters, lengthInMeters, fillColor="blue") {
+    drawRectangleInMeters(positionInMeters, dimensionsInMeters, comInMeters, angleInDegrees, fillColor) {
         const positionInPixels = this.meterCoordsToPixelCoords(positionInMeters);
+        const dimensionsInPixels = dimensionsInMeters.clone().multiplyScalar(this.pixelsPerMeter);
+        const comInPixels = comInMeters.clone().multiplyScalar(this.pixelsPerMeter);
         this.drawRectangleInPixels(
             positionInPixels,
-            comInMeters.clone().multiplyScalar(this.pixelsPerMeter),
+            comInPixels,
+            dimensionsInPixels,
             angleInDegrees,
-            widthInMeters * this.pixelsPerMeter,
-            lengthInMeters * this.pixelsPerMeter,
             fillColor
         );
-        this.drawDotInPixels(positionInPixels.x, positionInPixels.y, 3, "red");
+        this.drawDotInPixels(positionInPixels, 3, "red");
         this.addLabelAtMeterCoords(
             positionInMeters.clone().subtractX(comInMeters).addY(comInMeters),
-            `(${positionInMeters.x.toFixed(2)}, ${positionInMeters.y.toFixed(2)}) angle: ${angleInDegrees.toFixed(2)}°`,
+            `(${positionInMeters.x.toFixed(1)}, ${positionInMeters.y.toFixed(1)}) angle: ${angleInDegrees.toFixed(0)}°`,
             "red"
         )
     }
 
-    drawDotInPixels(xInPixels, yInPixels, radiusInPixels, fillColor) {
+    drawDotInPixels(positionInPixels, radiusInPixels, fillColor) {
         const circle = document.createElementNS(svgNamespace, "circle");
-        circle.setAttribute("cx", xInPixels);
-        circle.setAttribute("cy", yInPixels);
+        circle.setAttribute("cx", positionInPixels.x);
+        circle.setAttribute("cy", positionInPixels.y);
         circle.setAttribute("r", radiusInPixels);
         circle.setAttribute("fill", fillColor);
         this.svg.appendChild(circle);
     }
 
-    drawRectangleInPixels(positionInPixels, comInPixelsxInPixels, angleInDegrees, widthInPixels, heightInPixels, fillColor){
+    // positionInPixels,
+    // comInPixels,
+    // dimensionsInPixels,
+    // angleInDegrees
+    // color
+    drawRectangleInPixels(positionInPixels, comInPixels, dimensionsInPixels, angleInDegrees, fillColor){
+        const rotateTransform = `${-1 * angleInDegrees} ${positionInPixels.x} ${positionInPixels.y}`;
+        const translateTranform = `${-1 * comInPixels.x} ${-1 * comInPixels.y}`;
         const rect = document.createElementNS(svgNamespace, "rect");
-        rect.setAttribute("x", positionInPixels.x - comInPixelsxInPixels.x);
-        rect.setAttribute("y", positionInPixels.y - comInPixelsxInPixels.y);
-        rect.setAttribute("width", widthInPixels);
-        rect.setAttribute("height", heightInPixels);
+        rect.setAttribute("x", positionInPixels.x);
+        rect.setAttribute("y", positionInPixels.y);
+        rect.setAttribute("width", dimensionsInPixels.x);
+        rect.setAttribute("height", dimensionsInPixels.y);
         rect.setAttribute("fill", fillColor);
-        rect.setAttribute("transform", `rotate(${90 - angleInDegrees} ${positionInPixels.x} ${positionInPixels.y})`);
+        rect.setAttribute("transform", `rotate(${rotateTransform}) translate(${translateTranform})`);
         this.svg.appendChild(rect);
     }
 
@@ -199,10 +207,9 @@ export class View{
     drawCar(car) {
         this.drawRectangleInMeters(
             car.position,
+            car.dimensions,
             car.com,
             car.angleInDegrees,
-            car.width,
-            car.length,
             car.color);
     }
 }
