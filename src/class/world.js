@@ -14,7 +14,7 @@ export class World{
             car.angle += car.angulerVelocity * this.timestepSeconds;
             car.position = new Victor(
                 20 * Math.sin(car.angle),
-                20 * Math.cos(car.angle)
+                -20 * Math.cos(car.angle)
             );
         });
     }

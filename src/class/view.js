@@ -35,14 +35,14 @@ export class View{
             positionInPixels,
             comInMeters.clone().multiplyScalar(this.pixelsPerMeter),
             angleInDegrees,
-            lengthInMeters * this.pixelsPerMeter,
             widthInMeters * this.pixelsPerMeter,
+            lengthInMeters * this.pixelsPerMeter,
             fillColor
         );
         this.drawDotInPixels(positionInPixels.x, positionInPixels.y, 3, "red");
         this.addLabelAtMeterCoords(
             positionInMeters.clone().subtractX(comInMeters).addY(comInMeters),
-            `(${positionInMeters.x.toFixed(2)}, ${positionInMeters.y.toFixed(2)})`,
+            `(${positionInMeters.x.toFixed(2)}, ${positionInMeters.y.toFixed(2)}) angle: ${angleInDegrees.toFixed(2)}°`,
             "red"
         )
     }
@@ -63,7 +63,7 @@ export class View{
         rect.setAttribute("width", widthInPixels);
         rect.setAttribute("height", heightInPixels);
         rect.setAttribute("fill", fillColor);
-        rect.setAttribute("transform", `rotate(${angleInDegrees} ${positionInPixels.x} ${positionInPixels.y})`);
+        rect.setAttribute("transform", `rotate(${90 - angleInDegrees} ${positionInPixels.x} ${positionInPixels.y})`);
         this.svg.appendChild(rect);
     }
 
