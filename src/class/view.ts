@@ -1,11 +1,16 @@
+import Victor from "victor";
 import { clamp } from "./helper.js";
+import { World } from "./world.js";
+import { Car } from "./car.js";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 export class View{
-    pixelsPerMeter = 12;
-    meterCenter = new Victor(0, 0);
-    constructor(world, svg){
+    pixelsPerMeter: number = 12;
+    meterCenter: Victor = new Victor(0, 0);
+    world: World;
+    svg: HTMLElement;
+    constructor(world: World, svg: HTMLElement) {
         this.world = world;
         this.svg = svg;
         this.animate();
@@ -31,7 +36,13 @@ export class View{
         });
     }
 
-    drawRectangleInMeters(positionInMeters, dimensionsInMeters, comInMeters, angleInDegrees, fillColor) {
+    drawRectangleInMeters(
+        positionInMeters: Victor,
+        dimensionsInMeters: Victor,
+        comInMeters: Victor,
+        angleInDegrees: number,
+        fillColor: string
+    ) {
         const positionInPixels = this.meterCoordsToPixelCoords(positionInMeters);
         const dimensionsInPixels = dimensionsInMeters.clone().multiplyScalar(this.pixelsPerMeter);
         const comInPixels = comInMeters.clone().multiplyScalar(this.pixelsPerMeter);
@@ -50,23 +61,33 @@ export class View{
         )
     }
 
-    drawDotInPixels(positionInPixels, radiusInPixels, fillColor) {
+    drawDotInPixels(
+        positionInPixels: Victor,
+        radiusInPixels: number,
+        fillColor: string
+    ) {
         const circle = document.createElementNS(svgNamespace, "circle");
-        circle.setAttribute("cx", positionInPixels.x);
-        circle.setAttribute("cy", positionInPixels.y);
-        circle.setAttribute("r", radiusInPixels);
+        circle.setAttribute("cx", positionInPixels.x.toString());
+        circle.setAttribute("cy", positionInPixels.y.toString());
+        circle.setAttribute("r", radiusInPixels.toString());
         circle.setAttribute("fill", fillColor);
         this.svg.appendChild(circle);
     }
 
-    drawRectangleInPixels(positionInPixels, comInPixels, dimensionsInPixels, angleInDegrees, fillColor){
+    drawRectangleInPixels(
+        positionInPixels: Victor,
+        comInPixels: Victor,
+        dimensionsInPixels: Victor,
+        angleInDegrees: number,
+        fillColor: string
+    ){
         const rotateTransform = `${-1 * angleInDegrees} ${positionInPixels.x} ${positionInPixels.y}`;
         const translateTranform = `${-1 * comInPixels.x} ${-1 * comInPixels.y}`;
         const rect = document.createElementNS(svgNamespace, "rect");
-        rect.setAttribute("x", positionInPixels.x);
-        rect.setAttribute("y", positionInPixels.y);
-        rect.setAttribute("width", dimensionsInPixels.x);
-        rect.setAttribute("height", dimensionsInPixels.y);
+        rect.setAttribute("x", positionInPixels.x.toString());
+        rect.setAttribute("y", positionInPixels.y.toString());
+        rect.setAttribute("width", dimensionsInPixels.x.toString());
+        rect.setAttribute("height", dimensionsInPixels.y.toString());
         rect.setAttribute("fill", fillColor);
         rect.setAttribute("transform", `rotate(${rotateTransform}) translate(${translateTranform})`);
         this.svg.appendChild(rect);
@@ -88,14 +109,14 @@ export class View{
         return this.heightInPixels / this.pixelsPerMeter;
     }
 
-    meterCoordsToPixelCoords(meterCoords) {
+    meterCoordsToPixelCoords(meterCoords: Victor) {
         const pixelCenterCoords = this.pixelCenterCoords;
         const xInPixels = pixelCenterCoords.x + (meterCoords.x-this.meterCenter.x) * this.pixelsPerMeter;
         const yInPixels = pixelCenterCoords.y - (meterCoords.y-this.meterCenter.y) * this.pixelsPerMeter;
         return new Victor(xInPixels, yInPixels);
     }
 
-    pixelCoordsToMeterCoords(pixelCoords) {
+    pixelCoordsToMeterCoords(pixelCoords: Victor) {
         return new Victor(
             (pixelCoords.x - this.widthInPixels / 2) / this.pixelsPerMeter + this.meterCenter.x,
             (pixelCoords.y - this.heightInPixels / 2) / this.pixelsPerMeter + this.meterCenter.y
@@ -115,55 +136,83 @@ export class View{
         return this.meterCenter.y + this.heightInMeters / 2;
     }
 
-    addLineViaMeterCoords(startMeterCoords, endMeterCoords, strokeColor = "black", strokeWidth = 1) {
+    addLineViaMeterCoords(
+        startMeterCoords: Victor,
+        endMeterCoords: Victor,
+        strokeColor: string = "black",
+        strokeWidth: number = 1
+    ) {
         const startPixelCoords = this.meterCoordsToPixelCoords(startMeterCoords);
         const endPixelCoords = this.meterCoordsToPixelCoords(endMeterCoords);
 
         this.addLineViaPixelCoords(startPixelCoords, endPixelCoords, strokeColor, strokeWidth); 
     }
 
-    addLineViaPixelCoords(startPixelCoords, endPixelCoords, strokeColor = "black", strokeWidth = 1) {
+    addLineViaPixelCoords(
+        startPixelCoords: Victor,
+        endPixelCoords: Victor,
+        strokeColor = "black",
+        strokeWidth = 1
+    ) {
         const line = document.createElementNS(svgNamespace, "line");
-        line.setAttribute("x1", startPixelCoords.x);
-        line.setAttribute("y1", startPixelCoords.y);
-        line.setAttribute("x2", endPixelCoords.x);
-        line.setAttribute("y2", endPixelCoords.y);
+        line.setAttribute("x1", startPixelCoords.x.toString());
+        line.setAttribute("y1", startPixelCoords.y.toString());
+        line.setAttribute("x2", endPixelCoords.x.toString());
+        line.setAttribute("y2", endPixelCoords.y.toString());
         line.setAttribute("stroke", strokeColor);
-        line.setAttribute("stroke-width", strokeWidth);
+        line.setAttribute("stroke-width", strokeWidth.toString());
         this.svg.appendChild(line);
     }
 
-    addHorizontalLineAtYMeters(y, strokeColor = "black", strokeWidth = 1) {
+    addHorizontalLineAtYMeters(
+        y: number,
+        strokeColor: string = "black",
+        strokeWidth: number = 1
+    ) {
         const start = new Victor(this.minXInMeters, y);
         const end = new Victor(this.maxXInMeters, y);
         this.addLineViaMeterCoords(start, end, strokeColor, strokeWidth);
     }
 
-    addVerticalLineAtXMeters(x, strokeColor = "black", strokeWidth = 1) {
+    addVerticalLineAtXMeters(x: number, strokeColor = "black", strokeWidth = 1) {
         const start = new Victor(x, this.minYInMeters);
         const end = new Victor(x, this.maxYInMeters);
         this.addLineViaMeterCoords(start, end, strokeColor, strokeWidth);
     }
 
-    addLabelAtMeterCoords(meterCoords, text, color, boundHor=false, boundVer=false) {
+    addLabelAtMeterCoords(
+        meterCoords: Victor,
+        text: string,
+        color: string,
+        boundHor: boolean=false,
+        boundVer: boolean=false
+    ) {
         const pixelCoords = this.meterCoordsToPixelCoords(meterCoords);
         this.addLabelAtPixelCoords(pixelCoords, text, color, boundHor, boundVer);
     }
 
-    addLabelAtPixelCoords(pixelCoords, text, fillColor, boundHor=false, boundVer=false) {
+    addLabelAtPixelCoords(
+        pixelCoords: Victor,
+        text: string,
+        fillColor: string,
+        boundHor: boolean=false,
+        boundVer: boolean=false
+    ) {
         const textElement = document.createElementNS(svgNamespace, "text");
-        textElement.setAttribute("x", pixelCoords.x+2);
-        textElement.setAttribute("y", pixelCoords.y-2);
-        textElement.setAttribute("font-size", 12);
+        textElement.setAttribute("x", (pixelCoords.x+2).toString());
+        textElement.setAttribute("y", (pixelCoords.y-2).toString());
+        textElement.setAttribute("font-size", (12).toString());
         textElement.setAttribute("fill", fillColor);
         textElement.textContent = text;
         this.svg.appendChild(textElement);
         const textBBox = textElement.getBBox();
         if(boundHor){
-            textElement.setAttribute("x", clamp(pixelCoords.x+2, 0, this.widthInPixels-textBBox.width));
+            const x = clamp(pixelCoords.x+2, 0, this.widthInPixels-textBBox.width);
+            textElement.setAttribute("x", x.toString());
         }
         if(boundVer){
-            textElement.setAttribute("y", clamp(pixelCoords.y-2, 0+textBBox.height, this.heightInPixels));
+            const y = clamp(pixelCoords.y-2, 0+textBBox.height, this.heightInPixels);
+            textElement.setAttribute("y", y.toString());
         }
     }
     
@@ -186,7 +235,7 @@ export class View{
         }
     }
 
-    addXTick(xInMeters) {
+    addXTick(xInMeters: number) {
         const color = (xInMeters === 0) ? "black" : "grey";
         const width = (xInMeters === 0) ? 1 : 0.5;
         this.addVerticalLineAtXMeters(xInMeters, color, width);
@@ -199,19 +248,20 @@ export class View{
         );
     }
 
-    addYTick(yInMeters) {
+    addYTick(yInMeters: number) {
         const color = (yInMeters === 0) ? "black" : "grey";
         const width = (yInMeters === 0) ? 1 : 0.5;
         this.addHorizontalLineAtYMeters(yInMeters, color, width);
         this.addLabelAtMeterCoords(
             new Victor(0, yInMeters),
             yInMeters.toFixed(2),
+            color,
             false,
             true
         );
     }
 
-    drawCar(car) {
+    drawCar(car: Car) {
         this.drawRectangleInMeters(
             car.position,
             car.dimensions,

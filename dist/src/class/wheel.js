@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wheel = void 0;
+const victor_1 = __importDefault(require("victor"));
 class Wheel {
     constructor(position) {
         this.angle = 0;
@@ -18,8 +22,12 @@ class Wheel {
         // Calculate the force based on the wheel's angle and car's speed
         const speed = car.velocity.length();
         const forceMagnitude = this.coefStaticFriction * car.mass * 9.81; // Force = μ * m * g
-        const forceDirection = new Victor(Math.cos(this.angle), Math.sin(this.angle));
+        const forceDirection = new victor_1.default(Math.cos(this.angle), Math.sin(this.angle));
         return forceDirection.multiplyScalar(forceMagnitude);
+    }
+    calculateTorque(car, force) {
+        const leverArm = this.getDiffFromCog(car);
+        return leverArm.cross(force);
     }
     getRelativeVelocity(car) {
         const absoluteVelocity = this.getAbsoluteVelocity(car);
@@ -32,7 +40,7 @@ class Wheel {
         return this.angle + car.angle;
     }
     getDiffFromCog(car) {
-        return this.position.clone().subtract(car.com).addAngle(car.angle);
+        return this.position.clone().subtract(car.com).rotate(car.angle);
     }
     getDistanceFromCog(car) {
         return this.getDiffFromCog(car).length();

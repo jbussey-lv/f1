@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const cars = [new car_js_1.Car()];
     const world = new world_js_1.World(cars);
     const svgCanvas = document.getElementById("svgCanvas");
+    if (!svgCanvas) {
+        throw new Error("SVG canvas not found");
+    }
     const view = new view_js_1.View(world, svgCanvas);
     view.draw();
 });

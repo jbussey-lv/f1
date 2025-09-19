@@ -1,6 +1,11 @@
+import Victor from "victor";
+import { Wheel } from "./wheel";
+
 export class Car{
     position = new Victor(20, 0);
     velocity = new Victor(0, 0);
+    length = 4
+    width = 2;
     _angle = 90 * Math.PI / 180; // in radians
     angulerVelocity = 25 * Math.PI / 180; // in radians per second
     dimensions = new Victor(10, 5);
@@ -9,10 +14,10 @@ export class Car{
     moment = (1/12) * this.mass * (this.length**2 + this.width**2);
     color = "blue"; // Default color for the car
     id = crypto.randomUUID();
-
-    update(timeStep){
-        totalForce = new Victor(0, 0);
-        totalTorque = 0;
+    wheels: Wheel[] = []
+    update(timeStep: number){
+        let totalForce = new Victor(0, 0);
+        let totalTorque = 0;
         for (const wheel of this.wheels) {
             const {force, torque} = wheel.getForceAndTorque(this);
             totalForce.add(force);
@@ -21,13 +26,13 @@ export class Car{
         this.updatePosition(totalForce, timeStep);
         this.updateAngle(totalTorque, timeStep);
     }
-    updatePosition(totalForce, timeStep) {
+    updatePosition(totalForce: Victor, timeStep: number) {
         const linearAcceleration = totalForce.divideScalar(this.mass);
         this.velocity.add(linearAcceleration.multiplyScalar(timeStep));
         this.position.add(this.velocity.multiplyScalar(timeStep));
     }
 
-    updateAngle(totalTorque, timeStep) {
+    updateAngle(totalTorque: number, timeStep: number) {
         const angularAcceleration = totalTorque / this.moment;
         this.angulerVelocity += angularAcceleration * timeStep;
         this.angle += this.angulerVelocity * timeStep;

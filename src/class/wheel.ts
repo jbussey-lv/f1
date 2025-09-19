@@ -1,3 +1,6 @@
+import Victor from "victor";
+import { Car } from "./car";
+
 export class Wheel{
 
     angle = 0;
@@ -7,18 +10,16 @@ export class Wheel{
     coefKineticFriction = 0.6; // Coefficient of kinetic friction
 
 
-    constructor(position) {
+    constructor(position: Victor) {
         this.position = position; // Position is a Victor object
     }
-    getForceAndTorque(car) {
+    getForceAndTorque(car: Car) {
         const force = this.calculateForce(car);
         const torque = this.calculateTorque(car, force);
         return {force, torque};
     }
 
-    calculateForce(car) {
-
-
+    calculateForce(car: Car) {
         // Calculate the force based on the wheel's angle and car's speed
         const speed = car.velocity.length();
         const forceMagnitude = this.coefStaticFriction * car.mass * 9.81; // Force = μ * m * g
@@ -26,28 +27,33 @@ export class Wheel{
         return forceDirection.multiplyScalar(forceMagnitude);
     }
 
-    getRelativeVelocity(car) {
+    calculateTorque(car: Car, force: Victor) {
+        const leverArm = this.getDiffFromCog(car);
+        return leverArm.cross(force);
+    }
+
+    getRelativeVelocity(car: Car): Victor {
         const absoluteVelocity = this.getAbsoluteVelocity(car);
         return absoluteVelocity.subtract(car.velocity);
     }
 
-    getAbsoluteVelocity(car) {
+    getAbsoluteVelocity(car: Car) {
         return this.getRelativeVelocity(car).add(car.velocity);
     }
 
-    getAbsoluteAngle(car) {
+    getAbsoluteAngle(car: Car) {
         return this.angle + car.angle;
     }
 
-    getDiffFromCog(car) {
-        return this.position.clone().subtract(car.com).addAngle(car.angle);
+    getDiffFromCog(car: Car) {
+        return this.position.clone().subtract(car.com).rotate(car.angle);
     }
 
-    getDistanceFromCog(car) {
+    getDistanceFromCog(car: Car) {
         return this.getDiffFromCog(car).length();
     }
 
-    getSpeed(car) {
+    getSpeed(car: Car) {
         return this.getRelativeVelocity(car).length();
     }
 }
