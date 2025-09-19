@@ -1,9 +1,12 @@
+import Victor from "victor";
+import { Car } from "./car";
 
 export class World{
     time = 0;
-    timestepSeconds = 1/120; // 60 FPS
+    timestepSeconds = 1/120; 
     timestepMilliseconds = this.timestepSeconds * 1000; // Convert to milliseconds
-    constructor(cars = []){
+    cars: Car[];
+    constructor(cars: Car[] = []){
         this.cars = cars;
         setInterval(() => this.run(), this.timestepMilliseconds);
     }
@@ -12,10 +15,10 @@ export class World{
         this.time += this.timestepSeconds;
         this.cars.forEach(car => {
             car.angle += car.angulerVelocity * this.timestepSeconds;
-            // car.position = new Victor(
-            //     20 * Math.sin(car.angle),
-            //     -20 * Math.cos(car.angle)
-            // );
+            car.position = new Victor(
+                20 * Math.sin(car.angle),
+                -20 * Math.cos(car.angle)
+            );
         });
     }
 

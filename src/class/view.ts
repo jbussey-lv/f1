@@ -1,3 +1,5 @@
+import { clamp } from "./helper.js";
+
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 export class View{
@@ -18,7 +20,7 @@ export class View{
 
     animate(){
         this.draw();
-        // requestAnimationFrame(() => this.animate());
+        requestAnimationFrame(() => this.animate());
     }
 
     draw() {
@@ -42,7 +44,7 @@ export class View{
         );
         this.drawDotInPixels(positionInPixels, 3, "red");
         this.addLabelAtMeterCoords(
-            positionInMeters.clone().subtractX(comInMeters).addY(comInMeters),
+            positionInMeters,
             `(${positionInMeters.x.toFixed(1)}, ${positionInMeters.y.toFixed(1)}) angle: ${angleInDegrees.toFixed(0)}°`,
             "red"
         )
@@ -57,11 +59,6 @@ export class View{
         this.svg.appendChild(circle);
     }
 
-    // positionInPixels,
-    // comInPixels,
-    // dimensionsInPixels,
-    // angleInDegrees
-    // color
     drawRectangleInPixels(positionInPixels, comInPixels, dimensionsInPixels, angleInDegrees, fillColor){
         const rotateTransform = `${-1 * angleInDegrees} ${positionInPixels.x} ${positionInPixels.y}`;
         const translateTranform = `${-1 * comInPixels.x} ${-1 * comInPixels.y}`;
@@ -86,14 +83,15 @@ export class View{
     get widthInMeters() {
         return this.widthInPixels / this.pixelsPerMeter;
     }
+    
     get heightInMeters() {
         return this.heightInPixels / this.pixelsPerMeter;
     }
 
     meterCoordsToPixelCoords(meterCoords) {
         const pixelCenterCoords = this.pixelCenterCoords;
-        const xInPixels = pixelCenterCoords.x + meterCoords.x * this.pixelsPerMeter;
-        const yInPixels = pixelCenterCoords.y - meterCoords.y * this.pixelsPerMeter;
+        const xInPixels = pixelCenterCoords.x + (meterCoords.x-this.meterCenter.x) * this.pixelsPerMeter;
+        const yInPixels = pixelCenterCoords.y - (meterCoords.y-this.meterCenter.y) * this.pixelsPerMeter;
         return new Victor(xInPixels, yInPixels);
     }
 
@@ -115,13 +113,6 @@ export class View{
     }
     get maxYInMeters() {
         return this.meterCenter.y + this.heightInMeters / 2;
-    }
-
-    get heightInMeters() {
-        return this.heightInPixels / this.pixelsPerMeter;
-    }
-    get widthInMeters() {
-        return this.widthInPixels / this.pixelsPerMeter;
     }
 
     addLineViaMeterCoords(startMeterCoords, endMeterCoords, strokeColor = "black", strokeWidth = 1) {
@@ -154,12 +145,12 @@ export class View{
         this.addLineViaMeterCoords(start, end, strokeColor, strokeWidth);
     }
 
-    addLabelAtMeterCoords(meterCoords, text, color) {
+    addLabelAtMeterCoords(meterCoords, text, color, boundHor=false, boundVer=false) {
         const pixelCoords = this.meterCoordsToPixelCoords(meterCoords);
-        this.addLabelAtPixelCoords(pixelCoords, text, color);
+        this.addLabelAtPixelCoords(pixelCoords, text, color, boundHor, boundVer);
     }
 
-    addLabelAtPixelCoords(pixelCoords, text, fillColor) {
+    addLabelAtPixelCoords(pixelCoords, text, fillColor, boundHor=false, boundVer=false) {
         const textElement = document.createElementNS(svgNamespace, "text");
         textElement.setAttribute("x", pixelCoords.x+2);
         textElement.setAttribute("y", pixelCoords.y-2);
@@ -167,6 +158,13 @@ export class View{
         textElement.setAttribute("fill", fillColor);
         textElement.textContent = text;
         this.svg.appendChild(textElement);
+        const textBBox = textElement.getBBox();
+        if(boundHor){
+            textElement.setAttribute("x", clamp(pixelCoords.x+2, 0, this.widthInPixels-textBBox.width));
+        }
+        if(boundVer){
+            textElement.setAttribute("y", clamp(pixelCoords.y-2, 0+textBBox.height, this.heightInPixels));
+        }
     }
     
     drawAxis() {
@@ -174,10 +172,10 @@ export class View{
         const oomWidth = 10**Math.floor(Math.log10(this.widthInMeters-1));
         const oom = Math.min(oomHeight, oomWidth);
 
-        const minXTick = Math.ceil(this.minXInMeters / oom) * oom;
-        const maxXTick = Math.floor(this.maxXInMeters / oom) * oom;
-        const minYTick = Math.ceil(this.minYInMeters / oom) * oom;
-        const maxYTick = Math.floor(this.maxYInMeters / oom) * oom;
+        const minXTick = (Math.ceil(this.minXInMeters / oom)-1) * oom;
+        const maxXTick = (Math.floor(this.maxXInMeters / oom)+1) * oom;
+        const minYTick = (Math.ceil(this.minYInMeters / oom)-1) * oom;
+        const maxYTick = (Math.floor(this.maxYInMeters / oom)+1) * oom;
 
         for (let yInMeters = minYTick; yInMeters <= maxYTick; yInMeters += oom) {
             this.addYTick(yInMeters);
@@ -192,16 +190,25 @@ export class View{
         const color = (xInMeters === 0) ? "black" : "grey";
         const width = (xInMeters === 0) ? 1 : 0.5;
         this.addVerticalLineAtXMeters(xInMeters, color, width);
-        const yInMeters = 0
-        this.addLabelAtMeterCoords(new Victor(xInMeters, yInMeters), xInMeters.toFixed(2), "black");
+        this.addLabelAtMeterCoords(
+            new Victor(xInMeters, 0),
+            xInMeters.toFixed(2),
+            "black",
+            false,
+            true
+        );
     }
 
     addYTick(yInMeters) {
         const color = (yInMeters === 0) ? "black" : "grey";
         const width = (yInMeters === 0) ? 1 : 0.5;
         this.addHorizontalLineAtYMeters(yInMeters, color, width);
-        const xInMeters = 0
-        this.addLabelAtMeterCoords(new Victor(xInMeters, yInMeters), yInMeters.toFixed(2), "black");
+        this.addLabelAtMeterCoords(
+            new Victor(0, yInMeters),
+            yInMeters.toFixed(2),
+            false,
+            true
+        );
     }
 
     drawCar(car) {
