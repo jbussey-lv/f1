@@ -1,5 +1,5 @@
 import Victor from 'victor';
-import { getFrictionForce } from '../src/friction';
+import { getFrictionForce } from '../src/module/friction';
 
 describe('getFrictionForce', () => {
     test('calculates static friction correctly when speed is below maxStaticFrictionSpeed', () => {

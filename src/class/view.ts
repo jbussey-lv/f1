@@ -1,12 +1,12 @@
 import Victor from "victor";
-import { clamp } from "./helper.js";
+import { clamp } from "../module/helper.ts";
 import { World } from "./world.js";
 import { Car } from "./car.js";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 export class View{
-    pixelsPerMeter: number = 12;
+    pixelsPerMeter: number = 6;
     meterCenter: Victor = new Victor(0, 0);
     world: World;
     svg: HTMLElement;

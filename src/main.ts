@@ -1,6 +1,6 @@
-import { View } from './class/view.js'
-import { Car } from './class/car.js'
-import { World } from './class/world.js'
+import { View } from './class/view.ts'
+import { Car } from './class/car.ts'
+import { World } from './class/world.ts'
 
 document.addEventListener("DOMContentLoaded", () => {
     const cars = [new Car()]
