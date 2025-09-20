@@ -21,7 +21,7 @@ export class Wheel{
 
     calculateForce(car: Car) {
         // Calculate the force based on the wheel's angle and car's speed
-        const speed = car.velocity.length();
+        // const speed = car.velocity.length();
         const forceMagnitude = this.coefStaticFriction * car.mass * 9.81; // Force = μ * m * g
         const forceDirection = new Victor(Math.cos(this.angle), Math.sin(this.angle));
         return forceDirection.multiplyScalar(forceMagnitude);
