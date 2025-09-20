@@ -1,0 +1,30 @@
+    name: Deploy to GitHub Pages
+
+    on:
+      push:
+        branches:
+          - main # Or your default branch like 'master'
+
+    jobs:
+      build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Setup Node.js (if needed for build)
+            uses: actions/setup-node@v4
+            with:
+              node-version: '20' # Or your required Node.js version
+
+          - name: Install dependencies (if needed for build)
+            run: npm install # Or yarn install, pnpm install
+
+          - name: Build project (if needed)
+            run: npm run build # Or your specific build command
+
+          - name: Deploy to GitHub Pages
+            uses: JamesIves/github-pages-deploy-action@v4
+            with:
+              branch: gh-pages
+              folder: build # Or the folder containing your built static files
