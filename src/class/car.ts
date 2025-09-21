@@ -3,7 +3,7 @@ import { Wheel } from "./wheel";
 import { Controller } from "./controller";
 
 export class Car{
-    position = new Victor(20, 0);
+    position = new Victor(0, 0);
     velocity = new Victor(0, 0);
     length = 4
     width = 2;

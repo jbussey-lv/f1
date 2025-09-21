@@ -19,8 +19,6 @@ export class World{
             const forward = new Victor(Math.cos(car.angle), Math.sin(car.angle))
                 .multiplyScalar(car.throttle);
 
-            console.log(forward);
-
             car.position.add(forward);
         });
     }
