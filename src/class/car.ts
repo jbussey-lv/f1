@@ -1,5 +1,6 @@
 import Victor from "victor";
 import { Wheel } from "./wheel";
+import { Controller } from "./controller";
 
 export class Car{
     position = new Victor(20, 0);
@@ -14,7 +15,9 @@ export class Car{
     moment = (1/12) * this.mass * (this.length**2 + this.width**2);
     color = "blue"; // Default color for the car
     id = crypto.randomUUID();
-    wheels: Wheel[] = []
+    wheels: Wheel[] = [];
+    controller: Controller | null = null; 
+    maxSteeringAngle = 40 * Math.PI / 180; // in radians
     update(timeStep: number){
         let totalForce = new Victor(0, 0);
         let totalTorque = 0;
@@ -23,8 +26,8 @@ export class Car{
             totalForce.add(force);
             totalTorque += torque;
         }
-        this.updatePosition(totalForce, timeStep);
-        this.updateAngle(totalTorque, timeStep);
+        // this.updatePosition(totalForce, timeStep);
+        // this.updateAngle(totalTorque, timeStep);
     }
     updatePosition(totalForce: Victor, timeStep: number) {
         const linearAcceleration = totalForce.divideScalar(this.mass);
@@ -47,5 +50,21 @@ export class Car{
     }
     set angle(value) {
         this._angle = value % (2 * Math.PI); // Keep angle within 0 to 2π
+    }
+
+    get steeringAngle() {
+        if(this.controller){
+            return this.controller.steering * this.maxSteeringAngle;
+        } else {
+            return 0;
+        }
+    }
+
+    get throttle() {
+        if(this.controller){
+            return this.controller.throttle;
+        } else {
+            return 0;
+        }
     }
 }
