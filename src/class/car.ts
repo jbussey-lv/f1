@@ -26,8 +26,8 @@ export class Car{
             totalForce.add(force);
             totalTorque += torque;
         }
-        // this.updatePosition(totalForce, timeStep);
-        // this.updateAngle(totalTorque, timeStep);
+        this.updatePosition(totalForce, timeStep);
+        this.updateAngle(totalTorque, timeStep);
     }
     updatePosition(totalForce: Victor, timeStep: number) {
         const linearAcceleration = totalForce.divideScalar(this.mass);
