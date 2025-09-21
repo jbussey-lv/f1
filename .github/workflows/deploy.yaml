@@ -27,4 +27,4 @@
             uses: JamesIves/github-pages-deploy-action@v4
             with:
               branch: gh-pages
-              folder: build # Or the folder containing your built static files
+              folder: dist # Or the folder containing your built static files
