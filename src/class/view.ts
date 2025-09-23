@@ -31,7 +31,7 @@ export class View{
     draw() {
         this.svg.innerHTML = ""; // Clear previous drawings
         this.drawAxis();
-        this.world.cars.forEach(car => {
+        this.world.bodies.forEach(car => {
             this.drawCar(car);
         });
     }
