@@ -1,7 +1,7 @@
 import Victor from "victor";
 import Body from "./body";
 
-export class World{
+export default class World{
     time = 0;
     timestepSeconds = 1/120; 
     timestepMilliseconds = this.timestepSeconds * 1000; // Convert to milliseconds
@@ -30,8 +30,10 @@ export class World{
 
     updateBodyLinear(body: Body, totalForce: Victor){
         const linearAcceleration = totalForce.divideScalar(body.mass);
-        body.velocity.add(linearAcceleration.multiplyScalar(this.timestepSeconds));
-        body.position.add(body.velocity.multiplyScalar(this.timestepSeconds));
+        const velocityDiff = linearAcceleration.clone().multiplyScalar(this.timestepSeconds);
+        body.velocity.add(velocityDiff);
+        const positionDiff = body.velocity.clone().multiplyScalar(this.timestepSeconds);
+        body.position.add(positionDiff);
     }
 
     updateBodyAngular(body: Body, totalTorque: number){

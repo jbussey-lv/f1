@@ -1,10 +1,9 @@
-import { View } from './class/view.ts'
-import { Car } from './class/car.ts'
-import { World } from './class/world.ts'
-import { Controller } from './class/controller.ts';
+import View from './class/view.ts'
+import World from './class/world.ts'
+// import { Controller } from './class/controller.ts';
+import { Bug } from './class/bug.ts';
 
-const cars = [new Car()]
-const world = new World(cars);
+const world = new World([new Bug()]);
 
 document.addEventListener("DOMContentLoaded", () => {
     const svgCanvas = document.getElementById("svgCanvas");
@@ -15,11 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
     view.draw();
 });
 
-// Event listener for when a gamepad is connected
-window.addEventListener("gamepadconnected", (event) => {
-  const gamepad = event.gamepad;
-  cars[0].controller = new Controller(gamepad);
-});
+// // Event listener for when a gamepad is connected
+// window.addEventListener("gamepadconnected", (event) => {
+//   const gamepad = event.gamepad;
+//   cars[0].controller = new Controller(gamepad);
+// });
 
 
 

@@ -1,12 +1,12 @@
 import Victor from "victor";
 import { clamp } from "../module/helper.ts";
-import { World } from "./world.js";
-import { Car } from "./car.js";
+import World from "./world.js";
+import Body from "./body.js";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
-export class View{
-    pixelsPerMeter: number = 6;
+export default class View{
+    pixelsPerMeter: number = 12;
     meterCenter: Victor = new Victor(0, 0);
     world: World;
     svg: HTMLElement;
@@ -29,11 +29,20 @@ export class View{
     }
 
     draw() {
-        this.svg.innerHTML = ""; // Clear previous drawings
+        this.clearCanvas();
         this.drawAxis();
-        this.world.bodies.forEach(car => {
-            this.drawCar(car);
+        this.world.bodies.forEach(body => {
+            this.drawBody(body);
         });
+    }
+
+    clearCanvas(){
+        this.svg.innerHTML = `  <defs>
+    <marker id="arrowhead" orient="auto" markerWidth="10" markerHeight="7"
+            refX="0" refY="2">
+      <path d="M0,0 L4,2 L0,4 Z" fill="red" />
+    </marker>
+  </defs>`;
     }
 
     drawRectangleInMeters(
@@ -163,6 +172,34 @@ export class View{
         line.setAttribute("stroke-width", strokeWidth.toString());
         this.svg.appendChild(line);
     }
+    
+    addArrowViaMeterCoords(
+        startMeterCoords: Victor,
+        endMeterCoords: Victor,
+        strokeColor: string = "black",
+        strokeWidth: number = 1
+    ) {
+        const startPixelCoords = this.meterCoordsToPixelCoords(startMeterCoords);
+        const endPixelCoords = this.meterCoordsToPixelCoords(endMeterCoords);
+        this.addArrowViaPixelCoords(startPixelCoords, endPixelCoords, strokeColor, strokeWidth);
+    }
+
+    addArrowViaPixelCoords(
+        startPixelCoords: Victor,
+        endPixelCoords: Victor,
+        strokeColor = "black",
+        strokeWidth = 1
+    ) {
+        const line = document.createElementNS(svgNamespace, "line");
+        line.setAttribute("x1", startPixelCoords.x.toString());
+        line.setAttribute("y1", startPixelCoords.y.toString());
+        line.setAttribute("x2", endPixelCoords.x.toString());
+        line.setAttribute("y2", endPixelCoords.y.toString());
+        line.setAttribute("stroke", strokeColor);
+        line.setAttribute("stroke-width", strokeWidth.toString());
+        line.setAttribute("marker-end", "url(#arrowhead)");
+        this.svg.appendChild(line);
+    }
 
     addHorizontalLineAtYMeters(
         y: number,
@@ -261,12 +298,19 @@ export class View{
         );
     }
 
-    drawCar(car: Car) {
+    drawBody(body: Body) {
         this.drawRectangleInMeters(
-            car.position,
-            car.dimensions,
-            car.com,
-            car.angleInDegrees,
-            car.color);
+            body.position,
+            body.dimensions,
+            body.com,
+            body.angleInDegrees,
+            body.color);
+
+        body.leverArms.forEach(leverArm => {
+            const start = body.position.clone().add(leverArm.displacement);
+            const end = start.clone().add(leverArm.force.clone().divideScalar(10)); // Scale down for visualization
+            this.addArrowViaMeterCoords(start, end, "red", 2);
+
+        });
     }
 }
