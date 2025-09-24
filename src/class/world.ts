@@ -6,6 +6,7 @@ export default class World{
     timestepSeconds = 1/120; 
     timestepMilliseconds = this.timestepSeconds * 1000; // Convert to milliseconds
     bodies: Body[];
+    gravity: Victor = new Victor(0, 9.81); // m/s^2 downward
 
     constructor(bodies: Body[] = []){
         this.bodies = bodies;
