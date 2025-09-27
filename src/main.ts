@@ -4,7 +4,12 @@ import World from './class/world.ts'
 import { Bug } from './class/bug.ts';
 import { Controller } from './class/controller.ts';
 
-const world = new World();
+
+const bug = new Bug();
+bug.position.x = 0;
+bug.position.y = 0;
+bug.angle = Math.PI / -6; // 90 degrees in radians
+const world = new World([bug]);
 
 document.addEventListener("DOMContentLoaded", () => {
     const svgCanvas = document.getElementById("svgCanvas");
@@ -14,10 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const view = new View(world, svgCanvas);
     view.draw();
 });
-
-
-const bug = new Bug();
-world.bodies.push(bug);
 
 // Event listener for when a gamepad is connected
 window.addEventListener("gamepadconnected", (event) => {

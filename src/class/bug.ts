@@ -9,18 +9,25 @@ export class Bug extends body{
     controller: Controller | null = null;;
 
     constructor(){
-        super([
+        super();
+    }
+
+    get rectangles(): Rectangle[] {
+        return [
             new Rectangle(5, 10, new Victor(0, 0), 1500, 0),
-            new Rectangle(7, 2, new Victor(0, -6), 500, 0, "blue")
-        ]);
+            new Rectangle(2, 4, new Victor(-3.7, 3), 50, this.getWheelAngle(), "black"),
+            new Rectangle(2, 4, new Victor(3.7, 3), 50, this.getWheelAngle(), "black"),
+            new Rectangle(2, 4, new Victor(-3.7, -3), 50, 0, "black"),
+            new Rectangle(2, 4, new Victor(3.7, -3), 50, 0, "black"),
+        ];
     }
 
     get leverArms(): LeverArm[] {
         return [
-            this.getThrottleLeverArm(),
-            this.getDragLeverArm(),
-            this.getSteeringLeverArm(),
-            this.getAngularDragLeverArm()
+            // this.getThrottleLeverArm(),
+            // this.getDragLeverArm(),
+            // this.getSteeringLeverArm(),
+            // this.getAngularDragLeverArm()
         ];
     }
 
@@ -46,6 +53,15 @@ export class Bug extends body{
         )
     }
 
+    getWheelAngle(): number {
+        if (!this.controller) {
+            return 0;
+        }
+        const maxSteeringAngle = Math.PI / 4; // Maximum steering angle in radians (30 degrees)
+        const angle = this.controller.steering * maxSteeringAngle;
+        return angle;
+    }
+
     getDragLeverArm(): LeverArm {
         const displacement = new Victor(0, 0);
         const dragConstant = 0.4257; // Drag constant for a car in kg/m
@@ -61,6 +77,10 @@ export class Bug extends body{
     }
 
     getThrottleLeverArm(): LeverArm {
+
+        if (!this.controller) {
+            return new LeverArm(new Victor(0,0), new Victor(0,0));
+        }
 
         const displacement = new Victor(0,0)
                                  .rotate(this.angle)

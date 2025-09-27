@@ -4,22 +4,22 @@ import Rectangle from "./rectangle";
 
 export default abstract class Body {
 
-    rectangles: Rectangle[];
     position = new Victor(0, 0);
     velocity = new Victor(0, 0);
     _angle = 0; // in radians
     angulerVelocity = 0; // in radians per second
     com: Victor; // center of mass
+    mass: number;
     momentOfInertia: number;
     id = crypto.randomUUID();
 
-    constructor(rectangles: Rectangle[] = []) {
-        this.rectangles = rectangles;
+    constructor() {
         this.com = this.getCom();
+        this.mass = this.getMass();
         this.momentOfInertia = this.getMomentOfInertia();
     }
 
-    get mass(): number {
+    getMass(): number {
         return this.rectangles.reduce(
             (sum, rect) => sum + rect.mass,
             0
@@ -78,4 +78,6 @@ export default abstract class Body {
     }
 
     abstract get leverArms(): LeverArm[];
+
+    abstract get rectangles(): Rectangle[];
 }

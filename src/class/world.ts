@@ -38,7 +38,7 @@ export default class World{
     }
 
     updateBodyAngular(body: Body, totalTorque: number){
-        const angularAcceleration = totalTorque / body.moment;
+        const angularAcceleration = totalTorque / body.momentOfInertia;
         body.angulerVelocity += angularAcceleration * this.timestepSeconds;
         body.angle += body.angulerVelocity * this.timestepSeconds;
     }

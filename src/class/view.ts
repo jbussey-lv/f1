@@ -2,6 +2,7 @@ import Victor from "victor";
 import { clamp } from "../module/helper.ts";
 import World from "./world.js";
 import Body from "./body.js";
+import Rectangle from "./rectangle.ts";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -47,16 +48,19 @@ export default class View{
 
     drawRectangleInMeters(
         positionInMeters: Victor,
-        dimensionsInMeters: Victor,
-        angleInDegrees: number,
+        widthInMeters: number,
+        heightInMeters: number,
+        angleInRadians: number,
         fillColor: string
     ) {
         const positionInPixels = this.meterCoordsToPixelCoords(positionInMeters);
-        const dimensionsInPixels = dimensionsInMeters.clone().multiplyScalar(this.pixelsPerMeter);
+        const widthInPixels = widthInMeters * this.pixelsPerMeter;
+        const heightInPixels = heightInMeters * this.pixelsPerMeter;
         this.drawRectangleInPixels(
             positionInPixels,
-            dimensionsInPixels,
-            angleInDegrees,
+            widthInPixels,
+            heightInPixels,
+            angleInRadians * 180 / Math.PI,
             fillColor
         );
     }
@@ -76,17 +80,18 @@ export default class View{
 
     drawRectangleInPixels(
         positionInPixels: Victor,
-        dimensionsInPixels: Victor,
+        widthInPixels: number,
+        heightInPixels: number,
         angleInDegrees: number,
         fillColor: string
     ){
         const rotateTransform = `${-1 * angleInDegrees} ${positionInPixels.x} ${positionInPixels.y}`;
-        const translateTranform = `${-1 * dimensionsInPixels.x/2} ${-1 * dimensionsInPixels.y/2}`;
+        const translateTranform = `${-1 * widthInPixels/2} ${-1 * heightInPixels/2}`;
         const rect = document.createElementNS(svgNamespace, "rect");
         rect.setAttribute("x", positionInPixels.x.toString());
         rect.setAttribute("y", positionInPixels.y.toString());
-        rect.setAttribute("width", dimensionsInPixels.x.toString());
-        rect.setAttribute("height", dimensionsInPixels.y.toString());
+        rect.setAttribute("width", widthInPixels.toString());
+        rect.setAttribute("height", heightInPixels.toString());
         rect.setAttribute("fill", fillColor);
         rect.setAttribute("transform", `rotate(${rotateTransform}) translate(${translateTranform})`);
         this.svg.appendChild(rect);
@@ -162,6 +167,8 @@ export default class View{
         line.setAttribute("stroke-width", strokeWidth.toString());
         this.svg.appendChild(line);
     }
+
+
     
     addArrowViaMeterCoords(
         startMeterCoords: Victor,
@@ -288,15 +295,37 @@ export default class View{
         );
     }
 
+    createRectElement(rectangle: Rectangle): SVGRectElement {
+        const rectElement = document.createElementNS(svgNamespace, "rect");
+        const positionInPixels = this.meterCoordsToPixelCoords(rectangle.position);
+        const widthInPixels = rectangle.width * this.pixelsPerMeter;
+        const heightInPixels = rectangle.height * this.pixelsPerMeter;
+        rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
+        rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
+        rectElement.setAttribute("width", widthInPixels.toString());
+        rectElement.setAttribute("height", heightInPixels.toString());
+        rectElement.setAttribute("fill", rectangle.color);
+        const rotateTransform = `${-1 * rectangle.angle * 180 / Math.PI} ${positionInPixels.x} ${positionInPixels.y}`;
+        rectElement.setAttribute("transform", `rotate(${rotateTransform})`);
+        return rectElement;
+    }
+
+
+
     drawBody(body: Body) {
+        const group = document.createElementNS(svgNamespace, "g");
         body.rectangles.forEach(rect => {
-            this.drawRectangleInMeters(
-                rect.position,
-                new Victor(rect.width, rect.height),
-                body.angleInDegrees,
-                rect.color);
-            }
-        );
+            group.appendChild(
+                this.createRectElement(rect)
+            );
+        });
+        const bodyPositionInPixels = this.meterCoordsToPixelCoords(body.position);
+        const rotateTransform = `${-1 * body.angle * 180 / Math.PI} ${bodyPositionInPixels.x} ${bodyPositionInPixels.y}`;
+        const translateTransform = `${body.position.x * this.pixelsPerMeter} ${-1 * body.position.y * this.pixelsPerMeter}`;
+        group.setAttribute("transform", `rotate(${rotateTransform}) translate(${translateTransform})`);
+
+        this.svg.appendChild(group);
+        // Draw center of mass
 
         this.drawDotInPixels(this.meterCoordsToPixelCoords(body.position), 3, "red");
         this.addLabelAtMeterCoords(
