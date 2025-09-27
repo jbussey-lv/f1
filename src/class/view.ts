@@ -6,7 +6,7 @@ import Body from "./body.js";
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 export default class View{
-    pixelsPerMeter: number = 12;
+    pixelsPerMeter: number = 6;
     meterCenter: Victor = new Victor(0, 0);
     world: World;
     svg: HTMLElement;
@@ -48,26 +48,17 @@ export default class View{
     drawRectangleInMeters(
         positionInMeters: Victor,
         dimensionsInMeters: Victor,
-        comInMeters: Victor,
         angleInDegrees: number,
         fillColor: string
     ) {
         const positionInPixels = this.meterCoordsToPixelCoords(positionInMeters);
         const dimensionsInPixels = dimensionsInMeters.clone().multiplyScalar(this.pixelsPerMeter);
-        const comInPixels = comInMeters.clone().multiplyScalar(this.pixelsPerMeter);
         this.drawRectangleInPixels(
             positionInPixels,
-            comInPixels,
             dimensionsInPixels,
             angleInDegrees,
             fillColor
         );
-        this.drawDotInPixels(positionInPixels, 3, "red");
-        this.addLabelAtMeterCoords(
-            positionInMeters,
-            `(${positionInMeters.x.toFixed(1)}, ${positionInMeters.y.toFixed(1)}) angle: ${angleInDegrees.toFixed(0)}°`,
-            "red"
-        )
     }
 
     drawDotInPixels(
@@ -85,13 +76,12 @@ export default class View{
 
     drawRectangleInPixels(
         positionInPixels: Victor,
-        comInPixels: Victor,
         dimensionsInPixels: Victor,
         angleInDegrees: number,
         fillColor: string
     ){
         const rotateTransform = `${-1 * angleInDegrees} ${positionInPixels.x} ${positionInPixels.y}`;
-        const translateTranform = `${-1 * comInPixels.x} ${-1 * comInPixels.y}`;
+        const translateTranform = `${-1 * dimensionsInPixels.x/2} ${-1 * dimensionsInPixels.y/2}`;
         const rect = document.createElementNS(svgNamespace, "rect");
         rect.setAttribute("x", positionInPixels.x.toString());
         rect.setAttribute("y", positionInPixels.y.toString());
@@ -299,16 +289,30 @@ export default class View{
     }
 
     drawBody(body: Body) {
-        this.drawRectangleInMeters(
-            body.position,
-            body.dimensions,
-            body.com,
-            body.angleInDegrees,
-            body.color);
+        body.rectangles.forEach(rect => {
+            this.drawRectangleInMeters(
+                rect.position,
+                new Victor(rect.width, rect.height),
+                body.angleInDegrees,
+                rect.color);
+            }
+        );
 
+        this.drawDotInPixels(this.meterCoordsToPixelCoords(body.position), 3, "red");
+        this.addLabelAtMeterCoords(
+            body.position,
+            `(${body.position.x.toFixed(1)}, ${body.position.y.toFixed(1)}) angle: ${body.angleInDegrees.toFixed(0)}°`,
+            "red"
+        )
+        
+        const minVectorMagnitude = 0.01;
         body.leverArms.forEach(leverArm => {
+            if(leverArm.force.length() < minVectorMagnitude){
+                return;
+            }
+            // Draw force vector
             const start = body.position.clone().add(leverArm.displacement);
-            const end = start.clone().add(leverArm.force.clone().divideScalar(10)); // Scale down for visualization
+            const end = start.clone().add(leverArm.force.clone().divideScalar(2000)); // Scale down for visualization
             this.addArrowViaMeterCoords(start, end, "red", 2);
 
         });

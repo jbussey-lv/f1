@@ -6,9 +6,6 @@ export class Controller{
     constructor(gamepad: Gamepad) {
         console.log("Controller initialized with gamepad:", gamepad.id);
         this.gamepad = gamepad;
-        setInterval(() => {
-            this.logit()
-        }, 500);
     }
 
     updateGamepad() {
@@ -38,9 +35,45 @@ export class Controller{
         }
     }
 
-    logit() {
-
-        console.log(this.steering, this.throttle);
-        
+    get leftX() {
+        return this.getAxesValue(0);
     }
+    get leftY() {
+        return this.getAxesValue(1);
+    }
+    get rightX() {
+        return this.getAxesValue(2);
+    }
+    get rightY() {
+        return this.getAxesValue(3);
+    }
+    get r1() {
+        return this.getButtonValue(5);
+    }
+    get r2() {
+        return this.getButtonValue(7);
+    }
+    get l1() {
+        return this.getButtonValue(4);
+    }
+    get l2() {
+        return this.getButtonValue(6);
+    }
+
+    getAxesValue(index: number) {
+        this.updateGamepad();
+        const axis = this.gamepad.axes[index];
+        if (axis && Math.abs(axis) > this.deadZone) {
+            return axis;
+        } else {
+            return 0;
+        }
+    }
+
+    getButtonValue(index: number) {
+        this.updateGamepad();
+        const button = this.gamepad.buttons[index];
+        return button ? button.value : 0;
+    }
+
 }

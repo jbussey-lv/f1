@@ -32,7 +32,7 @@ export class Car extends body{
         const drivingForce = new Victor(Math.cos(this.angle), Math.sin(this.angle)).multiplyScalar(drivingForceMagnitude);
         const rearAxleOffset = new Victor(this.dimensions.x * 0.25, 0).rotate(this.angle);
         const displacement = this.com.clone().subtract(rearAxleOffset);
-        return new LeverArm(displacement, drivingForce, this.com);
+        return new LeverArm(displacement, drivingForce);
     }
 
     getSteeringLeverArm(): LeverArm {
@@ -40,6 +40,6 @@ export class Car extends body{
         const steeringForce = new Victor(Math.cos(this.angle + Math.PI / 2), Math.sin(this.angle + Math.PI / 2)).multiplyScalar(steeringForceMagnitude);
         const frontAxleOffset = new Victor(this.dimensions.x * 0.75, 0).rotate(this.angle);
         const displacement = this.com.clone().subtract(frontAxleOffset);
-        return new LeverArm(displacement, steeringForce, this.com);
+        return new LeverArm(displacement, steeringForce);
     }
 }
