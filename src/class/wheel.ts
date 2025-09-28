@@ -1,6 +1,8 @@
 import Victor from "victor";
-import { Car } from "./car";
+import Body from "./body";
 import Rectangle from "./rectangle";
+import { mod } from "../module/helper";
+import LeverArm from "./lever-arm";
 
 export class Wheel extends Rectangle{
     muStatic: number; // Coefficient of static friction
@@ -12,8 +14,8 @@ export class Wheel extends Rectangle{
         muStatic: number = 0.8
     ) {
         super(
-            width,
             radius*2,
+            width,
             position,
             mass,
             0,
@@ -23,15 +25,27 @@ export class Wheel extends Rectangle{
     }
 
 
-    calculateForce(absoluteVecity: Victor, absoluteAngle: number, car: Car): Victor {
+    calculateForce(absoluteVecity: Victor, absoluteAngle: number): Victor {
         // Calculate the force based on the wheel's angle and car's speed
         // const speed = car.velocity.length();
-        const forceMagnitude = this.coefStaticFriction * car.mass * 9.81; // Force = μ * m * g
-        const forceDirection = new Victor(Math.cos(this.angle), Math.sin(this.angle));
-        return forceDirection.multiplyScalar(forceMagnitude);
+        const normalizedWheelAngle = mod(absoluteAngle, 2 * Math.PI);
+        const slipAngle = absoluteVecity.angle() - normalizedWheelAngle
+        const forceMagnitude = this.muStatic * Math.sin(slipAngle) * absoluteVecity.length();
+        const forceDirection = absoluteAngle + Math.PI / 2; // Perpendicular to the wheel's direction
+        
+        return new Victor(
+            forceMagnitude * Math.cos(forceDirection),
+            forceMagnitude * Math.sin(forceDirection)
+        );
     }
 
-
+    getLeverArm(body: Body): LeverArm {
+        const absoluteVelocity = this.getAbsoluteVelocity(body);
+        const absoluteAngle = this.getAbsoluteAngle(body);
+        const force = this.calculateForce(absoluteVelocity, absoluteAngle);
+        const arm = this.getArm(body);
+        return new LeverArm(arm, force);
+    }
 
     
 }

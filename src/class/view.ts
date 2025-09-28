@@ -7,7 +7,7 @@ import Rectangle from "./rectangle.ts";
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 export default class View{
-    pixelsPerMeter: number = 6;
+    pixelsPerMeter: number = 12;
     meterCenter: Victor = new Victor(0, 0);
     world: World;
     svg: HTMLElement;

@@ -3,16 +3,30 @@ import body from "./body";
 import LeverArm from "./lever-arm";
 import { Controller } from "./controller";
 import Rectangle from "./rectangle";
+import { Wheel } from "./wheel";
 
 export class Bug extends body{
 
     controller: Controller | null = null;
-    maxSteeringAngle = Math.PI / 4; // 45 degrees in radians
-    insideWheelSteeringMultiplier = 1.3; // Reduce the steering angle for the inside wheel
-    frontLeftWheelPosition = new Victor(-3.7, 3);
-    frontRightWheelPosition = new Victor(3.7, 3);
-    backLeftWheelPosition = new Victor(-3.7, -3);
-    backRightWheelPosition = new Victor(3.7, -3);
+    maxSteeringAngle: number = Math.PI / 4; // 45 degrees in radians
+    insideWheelSteeringMultiplier: number = 1.3; // Reduce the steering angle for the inside wheel  
+    chasisWidth: number = 2;
+    chasisLength: number = 6;
+
+    chasis: Rectangle = new Rectangle(this.chasisLength, this.chasisWidth, new Victor(0, 0), 1500, 0, "lightblue");
+
+    frontLeftWheel = new Wheel(
+        new Victor(this.chasisLength / 3, this.chasisWidth / 2)
+    );
+    frontRightWheel = new Wheel(
+        new Victor(this.chasisLength / 3, this.chasisWidth / -2)
+    );
+    backLeftWheel = new Wheel(
+        new Victor(this.chasisLength / -3, this.chasisWidth / 2)
+    );
+    backRightWheel = new Wheel(
+        new Victor(this.chasisLength / -3, this.chasisWidth / -2)
+    );
 
     constructor(){
         super();
@@ -20,18 +34,13 @@ export class Bug extends body{
 
     get rectangles(): Rectangle[] {
 
-        const frontLeftWheelPosition = new Victor(-3.7, 3);
-        const frontRightWheelPosition = new Victor(3.7, 3);
-        const backLeftWheelPosition = new Victor(-3.7, -3);
-        const backRightWheelPosition = new Victor(3.7, -3);
-
         return [
-            new Rectangle(5, 10, new Victor(0, 0), 1500, 0),
-            new Rectangle(2, 4, frontLeftWheelPosition, 50, this.leftWheelAngle, "black"),
-            new Rectangle(2, 4, frontRightWheelPosition, 50, this.rightWheelAngle, "black"),
-            new Rectangle(2, 4, backLeftWheelPosition, 50, 0, "black"),
-            new Rectangle(2, 4, backRightWheelPosition, 50, 0, "black"),
-        ];
+            this.chasis,
+            this.frontLeftWheel,
+            this.frontRightWheel,
+            this.backLeftWheel,
+            this.backRightWheel,
+        ]
     }
 
     get leftWheelAngle(): number {
@@ -48,31 +57,14 @@ export class Bug extends body{
             wheelAngle;
     }
 
-    getWheelLeverArm(relativeAngle: number, position: Victor): LeverArm {
-        const absoluteAngle = this.angle + relativeAngle;
-        const absoluteVelocity = this.getAbsoluteVelocity(position);
-        const forceMagnitude = -5 * Math.cos(absoluteAngle - absoluteVelocity.angle()) * absoluteVelocity.magnitude() * 200;
-        const forceDirection = absoluteAngle;
-        const force = new Victor(
-            forceMagnitude * Math.cos(forceDirection),
-            forceMagnitude * Math.sin(forceDirection)
-        );
-        return new LeverArm(
-            position.clone().rotate(this.angle),
-            force
-        )
-    }
-     
-
     get leverArms(): LeverArm[] {
         return [
             this.getThrottleLeverArm(),
             this.getDragLeverArm(),
-            this.getWheelLeverArm(this.leftWheelAngle, this.frontLeftWheelPosition),
-            this.getWheelLeverArm(this.rightWheelAngle, this.frontRightWheelPosition),
-            this.getWheelLeverArm(this.angle, this.backLeftWheelPosition),
-            this.getWheelLeverArm(this.angle, this.backRightWheelPosition),
-            // this.getAngularDragLeverArm()
+            this.frontLeftWheel.getLeverArm(this),
+            this.frontRightWheel.getLeverArm(this),
+            this.backLeftWheel.getLeverArm(this),
+            this.backRightWheel.getLeverArm(this)
         ];
     }
 

@@ -8,7 +8,7 @@ import { Controller } from './class/controller.ts';
 const bug = new Bug();
 bug.position.x = 0;
 bug.position.y = 0;
-bug.angle = Math.PI / -6; // 90 degrees in radians
+bug.angle = 90 * Math.PI / 180; // 90 degrees in radians
 const world = new World([bug]);
 
 document.addEventListener("DOMContentLoaded", () => {
