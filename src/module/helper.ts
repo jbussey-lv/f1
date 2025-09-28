@@ -8,3 +8,6 @@ export function degreesToRadians(degrees: number) {
 export function radiansToDegrees(radians: number) {
     return radians * 180 / Math.PI;
 }
+export function mod(num: number, modulus: number): number {
+    return ((num % modulus) + modulus) % modulus;
+}

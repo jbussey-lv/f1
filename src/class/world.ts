@@ -3,7 +3,7 @@ import Body from "./body";
 
 export default class World{
     time = 0;
-    timestepSeconds = 1/120; 
+    timestepSeconds = 1/30; 
     timestepMilliseconds = this.timestepSeconds * 1000; // Convert to milliseconds
     bodies: Body[];
     gravity: Victor = new Victor(0, 9.81); // m/s^2 downward
@@ -30,7 +30,13 @@ export default class World{
     }
 
     updateBodyLinear(body: Body, totalForce: Victor){
+        const minVelocity = 1;
+        const minLinearAcceleration = 0.05;
         const linearAcceleration = totalForce.divideScalar(body.mass);
+        if(body.velocity.magnitude() < minVelocity && linearAcceleration.magnitude() < minLinearAcceleration){
+            body.velocity = new Victor(0,0);
+            return
+        }
         const velocityDiff = linearAcceleration.clone().multiplyScalar(this.timestepSeconds);
         body.velocity.add(velocityDiff);
         const positionDiff = body.velocity.clone().multiplyScalar(this.timestepSeconds);
