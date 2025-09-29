@@ -8,7 +8,7 @@ import { Wheel } from "./wheel";
 export class Bug extends body{
 
     controller: Controller | null = null;
-    maxSteeringAngle: number = Math.PI / 4; // 45 degrees in radians
+    maxSteeringAngle: number = Math.PI / 6; // 45 degrees in radians
     insideWheelSteeringMultiplier: number = 1.3; // Reduce the steering angle for the inside wheel  
     chasisWidth: number = 2;
     chasisLength: number = 6;
@@ -34,6 +34,8 @@ export class Bug extends body{
 
     get rectangles(): Rectangle[] {
 
+        this.frontLeftWheel.angle = this.leftWheelAngle;
+        this.frontRightWheel.angle = this.rightWheelAngle;
         return [
             this.chasis,
             this.frontLeftWheel,
@@ -93,9 +95,8 @@ export class Bug extends body{
     getWheelAngle(): number {
         if (!this.controller) {
             return 0;
-        }
-        const maxSteeringAngle = Math.PI / 4; // Maximum steering angle in radians (30 degrees)
-        const angle = this.controller.steering * maxSteeringAngle;
+        } // Maximum steering angle in radians (30 degrees)
+        const angle = this.controller.steering * this.maxSteeringAngle;
         return angle;
     }
 
@@ -117,15 +118,14 @@ export class Bug extends body{
             return new LeverArm(new Victor(0,0), new Victor(0,0));
         }
 
-        const displacement = new Victor(0,0)
-                                 .rotate(this.angle)
+        const displacement = new Victor(0,0);
 
         const forceMagnitude = this.controller.r2 * this.mass * 20;
 
         // const location = this.position.clone().add(new Victor(this.dimensions.y * 0.25, 0));
         return new LeverArm(
             displacement,
-            new Victor(0, forceMagnitude).rotate(this.angle)
+            new Victor(forceMagnitude, 0).rotate(this.angle)
         )
     }
 
