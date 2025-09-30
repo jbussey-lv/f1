@@ -7,7 +7,7 @@ import Rectangle from "./rectangle.ts";
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 export default class View{
-    pixelsPerMeter: number = 12;
+    pixelsPerMeter: number = 8;
     meterCenter: Victor = new Victor(0, 0);
     world: World;
     svg: HTMLElement;
@@ -30,7 +30,11 @@ export default class View{
     }
 
     draw() {
+        const r = 15
         this.clearCanvas();
+        const bodyPos = this.world.bodies[0].position.clone();
+        this.meterCenter.x = clamp(this.meterCenter.x, bodyPos.x - r, bodyPos.x + r);
+        this.meterCenter.y = clamp(this.meterCenter.y, bodyPos.y - r, bodyPos.y + r); 
         this.drawAxis();
         this.world.bodies.forEach(body => {
             this.drawBody(body);
@@ -276,8 +280,8 @@ export default class View{
         this.addLabelAtMeterCoords(
             new Victor(xInMeters, 0),
             xInMeters.toFixed(2),
-            "black",
-            false,
+            color,
+            true,
             true
         );
     }
@@ -290,7 +294,7 @@ export default class View{
             new Victor(0, yInMeters),
             yInMeters.toFixed(2),
             color,
-            false,
+            true,
             true
         );
     }
@@ -328,11 +332,11 @@ export default class View{
         // Draw center of mass
 
         this.drawDotInPixels(this.meterCoordsToPixelCoords(body.position), 3, "red");
-        this.addLabelAtMeterCoords(
-            body.position,
-            `(${body.position.x.toFixed(1)}, ${body.position.y.toFixed(1)}) angle: ${body.angleInDegrees.toFixed(0)}°`,
-            "red"
-        )
+        // this.addLabelAtMeterCoords(
+        //     body.position,
+        //     `(${body.position.x.toFixed(1)}, ${body.position.y.toFixed(1)}) angle: ${body.angleInDegrees.toFixed(0)}°`,
+        //     "red"
+        // )
         
         const minVectorMagnitude = 0.01;
         body.leverArms.forEach(leverArm => {

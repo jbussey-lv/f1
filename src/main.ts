@@ -1,15 +1,15 @@
 import View from './class/view.ts'
 import World from './class/world.ts'
 // import { Controller } from './class/controller.ts';
-import { Bug } from './class/bug.ts';
+import { Car } from './class/car.ts';
 import { Controller } from './class/controller.ts';
 
 
-const bug = new Bug();
-bug.position.x = 0;
-bug.position.y = 0;
-bug.angle = 90 * Math.PI / 180; // 90 degrees in radians
-const world = new World([bug]);
+const car = new Car();
+car.position.x = 0;
+car.position.y = 0;
+car.angle = 90 * Math.PI / 180; // 90 degrees in radians
+const world = new World([car]);
 
 document.addEventListener("DOMContentLoaded", () => {
     const svgCanvas = document.getElementById("svgCanvas");
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Event listener for when a gamepad is connected
 window.addEventListener("gamepadconnected", (event) => {
   const gamepad = event.gamepad;
-  bug.controller = new Controller(gamepad);
+  car.controller = new Controller(gamepad);
   console.log(`Gamepad connected at index ${gamepad.index}: ${gamepad.id}.`);
 });
 
