@@ -12,6 +12,7 @@ export default abstract class Body {
     _mass: number | null = null; // in kg
     _momentOfInertia: number | null = null; // in kg*m^2
     id = crypto.randomUUID();
+    leverArms: LeverArm[] = [];
 
     get mass(): number {
         if (this._mass === null) {
@@ -104,7 +105,7 @@ export default abstract class Body {
         this._angle = mod(value, 2*Math.PI); // Keep angle within 0 to 2π
     }
 
-    abstract get leverArms(): LeverArm[];
+    abstract updateLeverArms(deltaTime: number): void;
 
     abstract get rectangles(): Rectangle[];
 }

@@ -50,6 +50,12 @@ export default class Rectangle{
                    .add(body.position); // Rotate around body's angle and translate to body's position
     }
 
+    getAngleOfAttack(body: Body): number {
+        const absoluteVelocity = this.getAbsoluteVelocity(body);
+        const absoluteAngle = this.getAbsoluteAngle(body);
+        return absoluteAngle - absoluteVelocity.angle();
+    }
+
     getTangentialVelocity(body: Body): Victor {
         const arm = this.getArm(body);
         return new Victor(-arm.y, arm.x) // Perpendicular vector

@@ -12,6 +12,7 @@ export class Car extends body{
     insideWheelSteeringMultiplier: number = 1.3; // Reduce the steering angle for the inside wheel  
     chasisWidth: number = 2;
     chasisLength: number = 6;
+    maxTorque: number = 15000; // Max engine torque in Nm
 
     chasis: Rectangle = new Rectangle(this.chasisLength, this.chasisWidth, new Victor(0, 0), 1500, 0, "lightblue");
 
@@ -59,14 +60,16 @@ export class Car extends body{
             wheelAngle;
     }
 
-    get leverArms(): LeverArm[] {
-        return [
-            this.getThrottleLeverArm(),
+    updateLeverArms(deltaTime: number): void {
+
+        const engineTorque = this.getEngineTorque();
+
+        this.leverArms = [
             this.getDragLeverArm(),
-            this.frontLeftWheel.getLeverArm(this),
-            this.frontRightWheel.getLeverArm(this),
-            this.backLeftWheel.getLeverArm(this),
-            this.backRightWheel.getLeverArm(this)
+            this.frontLeftWheel.getLeverArm(this, deltaTime),
+            this.frontRightWheel.getLeverArm(this, deltaTime),
+            this.backLeftWheel.getLeverArm(this, deltaTime, engineTorque),
+            this.backRightWheel.getLeverArm(this, deltaTime, engineTorque)
         ];
     }
 
@@ -112,21 +115,13 @@ export class Car extends body{
         )
     }
 
-    getThrottleLeverArm(): LeverArm {
+    getEngineTorque(): number {
 
         if (!this.controller) {
-            return new LeverArm(new Victor(0,0), new Victor(0,0));
+            return 0;
         }
 
-        const displacement = new Victor(0,0);
-
-        const forceMagnitude = this.controller.r2 * this.mass * 40;
-
-        // const location = this.position.clone().add(new Victor(this.dimensions.y * 0.25, 0));
-        return new LeverArm(
-            displacement,
-            new Victor(forceMagnitude, 0).rotate(this.angle)
-        )
+        return this.controller.r2 * this.maxTorque;
     }
 
 }

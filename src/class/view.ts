@@ -11,6 +11,7 @@ export default class View{
     meterCenter: Victor = new Victor(0, 0);
     world: World;
     svg: HTMLElement;
+    drawForceVectors: boolean = false;
     constructor(world: World, svg: HTMLElement) {
         this.world = world;
         this.svg = svg;
@@ -343,11 +344,13 @@ export default class View{
             if(leverArm.force.length() < minVectorMagnitude){
                 return;
             }
-            // Draw force vector
-            const start = body.position.clone().add(leverArm.displacement);
-            const end = start.clone().add(leverArm.force.clone().divideScalar(2000)); // Scale down for visualization
-            this.addArrowViaMeterCoords(start, end, "red", 2);
 
+            if(this.drawForceVectors){
+                // Draw lever arm
+                const start = body.position.clone();
+                const end = start.clone().add(leverArm.displacement);
+                this.addArrowViaMeterCoords(start, end, "blue", 2);
+            }
         });
     }
 }
