@@ -1,5 +1,5 @@
 import Victor from "victor";
-import Body from "./body";
+import Body from "../physics/body";
 
 export default class World{
     timestepSeconds = 1/30; 

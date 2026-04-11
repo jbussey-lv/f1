@@ -1,8 +1,8 @@
 import Victor from "victor";
-import body from "./body";
-import LeverArm from "./lever-arm";
-import { Controller } from "./controller";
-import Rectangle from "./rectangle";
+import body from "../physics/body";
+import LeverArm from "../physics/lever-arm";
+import { Controller } from "../game/controller";
+import Rectangle from "../shapes/rectangle";
 import { Wheel } from "./wheel";
 
 export class Car extends body{

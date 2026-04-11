@@ -1,8 +1,8 @@
 import Victor from "victor";
-import { clamp } from "../module/helper.ts";
+import { clamp } from "../../helper.ts";
 import World from "./world.js";
-import Body from "./body.js";
-import Rectangle from "./rectangle.ts";
+import Body from "../physics/body.js";
+import Rectangle from "../shapes/rectangle.ts";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 

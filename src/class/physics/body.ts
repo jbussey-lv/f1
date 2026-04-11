@@ -1,7 +1,7 @@
 import Victor from "victor";
 import LeverArm from "./lever-arm";
-import Rectangle from "./rectangle";
-import { mod } from "../module/helper";
+import Rectangle from "../shapes/rectangle";
+import { mod } from "../../helper";
 
 export default abstract class Body {
 

@@ -1,8 +1,8 @@
-import View from './class/view.ts'
-import World from './class/world.ts'
+import View from './class/game/view.ts'
+import World from './class/game/world.ts'
 // import { Controller } from './class/controller.ts';
-import { Car } from './class/car.ts';
-import { Controller } from './class/controller.ts';
+import { Car } from './class/car/car.ts';
+import { Controller } from './class/game/controller.ts';
 
 
 const car = new Car();

@@ -1,8 +1,8 @@
 import Victor from "victor";
-import Body from "./body";
-import Rectangle from "./rectangle";
-import { mod } from "../module/helper";
-import LeverArm from "./lever-arm";
+import Body from "../physics/body";
+import Rectangle from "../shapes/rectangle";
+import { mod } from "../../helper";
+import LeverArm from "../physics/lever-arm";
 
 export class Wheel extends Rectangle{
     muStatic: number; // Coefficient of static friction

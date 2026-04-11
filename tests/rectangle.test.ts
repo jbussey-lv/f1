@@ -1,7 +1,7 @@
 import Victor from "victor";
-import Rectangle from "../src/class/rectangle";
-import Body from "../src/class/body";
-import LeverArm from "../src/class/lever-arm";
+import Rectangle from "../src/class/shapes/rectangle";
+import Body from "../src/class/physics/body";
+import LeverArm from "../src/class/physics/lever-arm";
 
 describe("Rectangle", () => {
 
