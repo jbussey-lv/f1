@@ -29,10 +29,20 @@ export class Car extends body{
     backRightWheel = new Wheel(
         new Victor(this.chasisLength / -3, this.chasisWidth / -2)
     );
-    circle = new Circle(
+    circle1 = new Circle(
+        1.5,
+        new Victor(5,0),
         1,
-        new Victor(0,0),
-        1
+        0,
+        "green"
+    )
+
+    circle2 = new Circle(
+        1.5,
+        new Victor(-5,0),
+        1,
+        0,
+        "green"
     )
 
     constructor(){
@@ -49,7 +59,8 @@ export class Car extends body{
             this.frontRightWheel,
             this.backLeftWheel,
             this.backRightWheel,
-            this.circle
+            this.circle1,
+            this.circle2
         ]
     }
 
