@@ -18,10 +18,16 @@ export default abstract class AbstractShape{
         this.mass = mass;
         this.angle = angle;
         this.color = color;
-        
     }
 
     abstract get com(): Victor;
+
+    abstract getSvgElement(
+        document: Document,
+        svgNamespace: string,
+        pixelsPerMeter: number,
+        positionInPixels: Victor
+    ): SVGElement;
 
     getRelativePositionUnrotated(body: Body): Victor {
         return this.position.clone().subtract(body.com)

@@ -1,14 +1,8 @@
 import Victor from "victor";
-import Body from "../physics/body";
+import AbstractShape from "./abstract_shape";
 
-export default class Circle{
+export default class Circle extends AbstractShape{
     radius: number;
-    position: Victor;
-    mass: number;
-    angle: number = 0; // in radians
-    _com: Victor | null = null; // center of mass
-    color: string = "blue";
-    id: string = crypto.randomUUID();
 
     constructor(
         radius: number, // vertical
@@ -17,6 +11,12 @@ export default class Circle{
         angle: number = 0,
         color: string = "blue"
     ){
+        super(
+            position,
+            mass,
+            angle,
+            color
+        )
         this.radius = radius;
         this.position = position;
         this.mass = mass;
@@ -28,32 +28,4 @@ export default class Circle{
         return new Victor(this.radius, this.radius);
     }
 
-    getRelativePositionUnrotated(body: Body): Victor {
-        return this.position.clone().subtract(body.com)
-    }
-
-    getArm(body: Body): Victor {
-        return this.getRelativePositionUnrotated(body)
-                   .rotate(body.angle);
-    }
-
-    getAbsoluteAngle(body: Body): number {
-        return body.angle + this.angle;
-    }
-
-    getAbsolutePosition(body: Body): Victor {
-        return this.getArm(body)
-                   .add(body.position); // Rotate around body's angle and translate to body's position
-    }
-
-    getTangentialVelocity(body: Body): Victor {
-        const arm = this.getArm(body);
-        return new Victor(-arm.y, arm.x) // Perpendicular vector
-            .multiplyScalar(body.angulerVelocity);
-    }
-
-    getAbsoluteVelocity(body: Body): Victor {
-        return this.getTangentialVelocity(body).add(body.velocity);
-    }
-     
 }

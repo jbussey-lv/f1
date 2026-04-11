@@ -3,6 +3,7 @@ import { clamp } from "../../helper.ts";
 import World from "./world.js";
 import Body from "../physics/body.js";
 import Rectangle from "../shapes/rectangle.ts";
+import AbstractShape from "../shapes/abstract_shape.ts";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -299,8 +300,8 @@ export default class View{
         );
     }
 
-    createRectElement(rectangle: Rectangle): SVGRectElement {
-        const rectElement = document.createElementNS(svgNamespace, "rect");
+    createRectElement(rectangle: Rectangle): SVGElement {
+        const rectElement = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         const positionInPixels = this.meterCoordsToPixelCoords(rectangle.position);
         const widthInPixels = rectangle.width * this.pixelsPerMeter;
         const heightInPixels = rectangle.height * this.pixelsPerMeter;
@@ -314,14 +315,16 @@ export default class View{
         return rectElement;
     }
 
-
-
     drawBody(body: Body) {
         const group = document.createElementNS(svgNamespace, "g");
-        body.rectangles.forEach(rect => {
-            group.appendChild(
-                this.createRectElement(rect)
-            );
+        body.shapes.forEach((shape: AbstractShape) => {
+            const svgElement = shape.getSvgElement(
+                document,
+                svgNamespace,
+                this.pixelsPerMeter,
+                this.meterCoordsToPixelCoords(shape.position)
+            )
+            group.appendChild(svgElement);
         });
         const bodyPositionInPixels = this.meterCoordsToPixelCoords(body.position);
         const rotateTransform = `${-1 * body.angle * 180 / Math.PI} ${bodyPositionInPixels.x} ${bodyPositionInPixels.y}`;

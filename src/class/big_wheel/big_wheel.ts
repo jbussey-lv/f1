@@ -3,11 +3,8 @@ import body from "../physics/body";
 import LeverArm from "../physics/lever-arm";
 import { Controller } from "../game/controller";
 import Rectangle from "../shapes/rectangle";
-import { Wheel } from "./wheel";
-import AbstractShape from "../shapes/abstract_shape";
-import Circle from "../shapes/circle";
 
-export class Car extends body{
+export class BigWheel extends body{
 
     controller: Controller | null = null;
     maxSteeringAngle: number = Math.PI / 6; // 45 degrees in radians
@@ -29,17 +26,12 @@ export class Car extends body{
     backRightWheel = new Wheel(
         new Victor(this.chasisLength / -3, this.chasisWidth / -2)
     );
-    circle = new Circle(
-        1,
-        new Victor(0,0),
-        1
-    )
 
     constructor(){
         super();
     }
 
-    get shapes(): AbstractShape[] {
+    get shapes(): Rectangle[] {
 
         this.frontLeftWheel.angle = this.leftWheelAngle;
         this.frontRightWheel.angle = this.rightWheelAngle;
@@ -49,7 +41,6 @@ export class Car extends body{
             this.frontRightWheel,
             this.backLeftWheel,
             this.backRightWheel,
-            // this.circle
         ]
     }
 

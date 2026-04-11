@@ -1,7 +1,7 @@
 import Victor from "victor";
 import LeverArm from "./lever-arm";
-import Rectangle from "../shapes/rectangle";
 import { mod } from "../../helper";
+import AbstractShape from "../shapes/abstract_shape";
 
 export default abstract class Body {
 
@@ -46,7 +46,7 @@ export default abstract class Body {
     }
 
     calculateMass(): number {
-        return this.rectangles.reduce(
+        return this.shapes.reduce(
             (sum, rect) => sum + rect.mass,
             0
         );
@@ -57,7 +57,7 @@ export default abstract class Body {
         let sumOfMassTimesX = 0;
         let sumOfMassTimesY = 0;
       
-        for (const rect of this.rectangles) {
+        for (const rect of this.shapes) {
           totalMass += rect.mass;
           sumOfMassTimesX += rect.mass * rect.position.x;
           sumOfMassTimesY += rect.mass * rect.position.y;
@@ -78,7 +78,7 @@ export default abstract class Body {
         const com = this.com; // Center of mass of the body
         let totalMomentOfInertia = 0;
 
-        for (const rect of this.rectangles) {
+        for (const rect of this.shapes) {
             // Distance from the rectangle's center to the body's center of mass
             const distanceToCOM = rect.position.clone().subtract(com).magnitude();
 
@@ -106,5 +106,5 @@ export default abstract class Body {
 
     abstract get leverArms(): LeverArm[];
 
-    abstract get rectangles(): Rectangle[];
+    abstract get shapes(): AbstractShape[];
 }

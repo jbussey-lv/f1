@@ -7,7 +7,7 @@ describe("Rectangle", () => {
 
     class TestBody extends Body {
         leverArms: LeverArm[] = [];
-        rectangles: Rectangle[] = [];
+        shapes: Rectangle[] = [];
         position: Victor = new Victor(0, 0);
 
         get com(): Victor {
@@ -18,7 +18,7 @@ describe("Rectangle", () => {
 
         const testBody = new TestBody();
         const testRect = new Rectangle(2, 4, new Victor(0, 0), 10, 0);
-        testBody.rectangles = [testRect];
+        testBody.shapes = [testRect];
 
         const testCases: {p: Victor, a: number, av: number, expected: Victor}[] = [
             {
@@ -78,7 +78,7 @@ describe("Rectangle", () => {
 
         const testBody = new TestBody();
         const testRect = new Rectangle(2, 4, new Victor(0, 0), 10, 0);
-        testBody.rectangles = [testRect];
+        testBody.shapes = [testRect];
 
         const testCases: {p: Victor, a: number, expected: Victor}[] = [
             {
