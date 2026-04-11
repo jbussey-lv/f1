@@ -38,17 +38,15 @@ export default class Circle extends AbstractShape{
         pixelsPerMeter: number,
         positionInPixels: Victor
     ): SVGElement {
-        const rectElement = document.createElementNS(svgNamespace, "rect");
-        const widthInPixels = this.radius * pixelsPerMeter;
-        const heightInPixels = this.radius * pixelsPerMeter;
-        rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
-        rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
-        rectElement.setAttribute("width", widthInPixels.toString());
-        rectElement.setAttribute("height", heightInPixels.toString());
-        rectElement.setAttribute("fill", this.color);
-        const rotateTransform = `${-1 * this.angle * 180 / Math.PI} ${positionInPixels.x} ${positionInPixels.y}`;
-        rectElement.setAttribute("transform", `rotate(${rotateTransform})`);
-        return rectElement;
+        const circElement = document.createElementNS(svgNamespace, "circle");
+        const radiusInPixels = this.radius * pixelsPerMeter;
+
+        circElement.setAttribute("cx", positionInPixels.x.toString());
+        circElement.setAttribute("cy", positionInPixels.y.toString());
+        circElement.setAttribute("r", radiusInPixels.toString());
+        circElement.setAttribute("fill", this.color);
+
+        return circElement;
     }
 
 }

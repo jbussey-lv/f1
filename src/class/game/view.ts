@@ -303,12 +303,16 @@ export default class View{
     drawBody(body: Body) {
         const group = document.createElementNS(svgNamespace, "g");
         body.shapes.forEach((shape: AbstractShape) => {
+            const positionInPixels = this.meterCoordsToPixelCoords(shape.position);
             const svgElement = shape.getSvgElement(
                 document,
                 svgNamespace,
                 this.pixelsPerMeter,
-                this.meterCoordsToPixelCoords(shape.position)
+                positionInPixels
             )
+            const rotateTransform = `${-1 * shape.angle * 180 / Math.PI} ${positionInPixels.x} ${positionInPixels.y}`;
+            svgElement.setAttribute("transform", `rotate(${rotateTransform})`);
+        
             group.appendChild(svgElement);
         });
         const bodyPositionInPixels = this.meterCoordsToPixelCoords(body.position);

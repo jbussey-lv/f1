@@ -45,8 +45,6 @@ export default class Rectangle extends AbstractShape{
         rectElement.setAttribute("width", widthInPixels.toString());
         rectElement.setAttribute("height", heightInPixels.toString());
         rectElement.setAttribute("fill", this.color);
-        const rotateTransform = `${-1 * this.angle * 180 / Math.PI} ${positionInPixels.x} ${positionInPixels.y}`;
-        rectElement.setAttribute("transform", `rotate(${rotateTransform})`);
         return rectElement;
     }
 
