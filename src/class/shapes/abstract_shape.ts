@@ -22,6 +22,8 @@ export default abstract class AbstractShape{
 
     abstract get com(): Victor;
 
+    abstract get momentOfInertia(): number;
+
     abstract getSvgElement(
         document: Document,
         svgNamespace: string,

@@ -300,21 +300,6 @@ export default class View{
         );
     }
 
-    createRectElement(rectangle: Rectangle): SVGElement {
-        const rectElement = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        const positionInPixels = this.meterCoordsToPixelCoords(rectangle.position);
-        const widthInPixels = rectangle.width * this.pixelsPerMeter;
-        const heightInPixels = rectangle.height * this.pixelsPerMeter;
-        rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
-        rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
-        rectElement.setAttribute("width", widthInPixels.toString());
-        rectElement.setAttribute("height", heightInPixels.toString());
-        rectElement.setAttribute("fill", rectangle.color);
-        const rotateTransform = `${-1 * rectangle.angle * 180 / Math.PI} ${positionInPixels.x} ${positionInPixels.y}`;
-        rectElement.setAttribute("transform", `rotate(${rotateTransform})`);
-        return rectElement;
-    }
-
     drawBody(body: Body) {
         const group = document.createElementNS(svgNamespace, "g");
         body.shapes.forEach((shape: AbstractShape) => {

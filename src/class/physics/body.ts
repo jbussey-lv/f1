@@ -78,15 +78,12 @@ export default abstract class Body {
         const com = this.com; // Center of mass of the body
         let totalMomentOfInertia = 0;
 
-        for (const rect of this.shapes) {
+        for (const shape of this.shapes) {
             // Distance from the rectangle's center to the body's center of mass
-            const distanceToCOM = rect.position.clone().subtract(com).magnitude();
-
-            // Moment of inertia for the rectangle about its own center
-            const rectMomentOfInertia = (1 / 12) * rect.mass * (rect.width ** 2 + rect.height ** 2);
+            const distanceToCOM = shape.position.clone().subtract(com).magnitude();
 
             // Parallel axis theorem: I = I_center + m * d^2
-            totalMomentOfInertia += rectMomentOfInertia + rect.mass * distanceToCOM ** 2;
+            totalMomentOfInertia += shape.momentOfInertia + shape.mass * distanceToCOM ** 2;
         }
 
         return totalMomentOfInertia;

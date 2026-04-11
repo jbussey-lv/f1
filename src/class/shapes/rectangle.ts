@@ -27,6 +27,10 @@ export default class Rectangle extends AbstractShape{
         return new Victor(this.width / 2, this.height / 2);
     }
 
+    get momentOfInertia(): number{
+        return (1 / 12) * this.mass * (this.width ** 2 + this.height ** 2);
+    }
+
     getSvgElement(
         document: Document,
         svgNamespace: string,

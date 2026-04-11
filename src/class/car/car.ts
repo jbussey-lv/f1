@@ -49,7 +49,7 @@ export class Car extends body{
             this.frontRightWheel,
             this.backLeftWheel,
             this.backRightWheel,
-            // this.circle
+            this.circle
         ]
     }
 
