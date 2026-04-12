@@ -2,7 +2,6 @@ import Victor from "victor";
 import { clamp } from "../../helper.ts";
 import World from "./world.js";
 import Body from "../physics/body.js";
-import Rectangle from "../shapes/rectangle.ts";
 import AbstractShape from "../shapes/abstract_shape.ts";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
