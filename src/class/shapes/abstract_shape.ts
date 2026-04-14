@@ -24,13 +24,6 @@ export default abstract class AbstractShape{
 
     abstract get momentOfInertia(): number;
 
-    abstract getSvgElement(
-        document: Document,
-        svgNamespace: string,
-        pixelsPerMeter: number,
-        positionInPixels: Victor
-    ): SVGElement;
-
     getRelativePositionUnrotated(body: Body): Victor {
         return this.position.clone().subtract(body.com)
     }

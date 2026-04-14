@@ -31,22 +31,5 @@ export default class Rectangle extends AbstractShape{
         return (1 / 12) * this.mass * (this.width ** 2 + this.height ** 2);
     }
 
-    getSvgElement(
-        document: Document,
-        svgNamespace: string,
-        pixelsPerMeter: number,
-        positionInPixels: Victor
-    ): SVGElement {
-        const rectElement = document.createElementNS(svgNamespace, "rect");
-        const widthInPixels = this.width * pixelsPerMeter;
-        const heightInPixels = this.height * pixelsPerMeter;
-        rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
-        rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
-        rectElement.setAttribute("width", widthInPixels.toString());
-        rectElement.setAttribute("height", heightInPixels.toString());
-        rectElement.setAttribute("fill", this.color);
-        return rectElement;
-    }
-
      
 }

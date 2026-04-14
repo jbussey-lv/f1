@@ -32,21 +32,4 @@ export default class Circle extends AbstractShape{
         return (1 / 2) * this.mass * (this.radius ** 2);
     }
 
-    getSvgElement(
-        document: Document,
-        svgNamespace: string,
-        pixelsPerMeter: number,
-        positionInPixels: Victor
-    ): SVGElement {
-        const circElement = document.createElementNS(svgNamespace, "circle");
-        const radiusInPixels = this.radius * pixelsPerMeter;
-
-        circElement.setAttribute("cx", positionInPixels.x.toString());
-        circElement.setAttribute("cy", positionInPixels.y.toString());
-        circElement.setAttribute("r", radiusInPixels.toString());
-        circElement.setAttribute("fill", this.color);
-
-        return circElement;
-    }
-
 }

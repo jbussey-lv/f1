@@ -3,6 +3,8 @@ import { clamp } from "../../helper.ts";
 import World from "./world.js";
 import Body from "../physics/body.js";
 import AbstractShape from "../shapes/abstract_shape.ts";
+import Rectangle from "../shapes/rectangle.ts";
+import Circle from "../shapes/circle.ts";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -49,6 +51,7 @@ export default class View{
     </marker>
   </defs>`;
     }
+    
 
     drawRectangleInMeters(
         positionInMeters: Victor,
@@ -82,13 +85,13 @@ export default class View{
         this.svg.appendChild(circle);
     }
 
-    drawRectangleInPixels(
+    getRectangleInPixels(
         positionInPixels: Victor,
         widthInPixels: number,
         heightInPixels: number,
         angleInDegrees: number,
         fillColor: string
-    ){
+    ): SVGRectElement{
         const rotateTransform = `${-1 * angleInDegrees} ${positionInPixels.x} ${positionInPixels.y}`;
         const translateTranform = `${-1 * widthInPixels/2} ${-1 * heightInPixels/2}`;
         const rect = document.createElementNS(svgNamespace, "rect");
@@ -98,6 +101,23 @@ export default class View{
         rect.setAttribute("height", heightInPixels.toString());
         rect.setAttribute("fill", fillColor);
         rect.setAttribute("transform", `rotate(${rotateTransform}) translate(${translateTranform})`);
+        return rect;
+    }
+
+    drawRectangleInPixels(
+        positionInPixels: Victor,
+        widthInPixels: number,
+        heightInPixels: number,
+        angleInDegrees: number,
+        fillColor: string
+    ){
+        const rect = this.getRectangleInPixels(
+            positionInPixels,
+            widthInPixels,
+            heightInPixels,
+            angleInDegrees,
+            fillColor
+        )
         this.svg.appendChild(rect);
     }
 
@@ -299,19 +319,47 @@ export default class View{
         );
     }
 
+    rectangleToSVG(rectangle: Rectangle): SVGRectElement{
+        const positionInPixels = this.meterCoordsToPixelCoords(rectangle.position)
+        const rectElement = document.createElementNS(svgNamespace, "rect");
+        const widthInPixels = rectangle.width * this.pixelsPerMeter;
+        const heightInPixels = rectangle.height * this.pixelsPerMeter;
+        rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
+        rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
+        rectElement.setAttribute("width", widthInPixels.toString());
+        rectElement.setAttribute("height", heightInPixels.toString());
+        rectElement.setAttribute("fill", rectangle.color);
+        return rectElement;
+    }
+
     drawBody(body: Body) {
         const group = document.createElementNS(svgNamespace, "g");
         body.shapes.forEach((shape: AbstractShape) => {
+            let svgElement: SVGElement;
             const positionInPixels = this.meterCoordsToPixelCoords(shape.position);
-            const svgElement = shape.getSvgElement(
-                document,
-                svgNamespace,
-                this.pixelsPerMeter,
-                positionInPixels
-            )
-            const rotateTransform = `${-1 * shape.angle * 180 / Math.PI} ${positionInPixels.x} ${positionInPixels.y}`;
-            svgElement.setAttribute("transform", `rotate(${rotateTransform})`);
+            if(shape instanceof Rectangle){
+                const rectangle = shape as Rectangle;
+                const rectElement = document.createElementNS(svgNamespace, "rect");
+                const widthInPixels = rectangle.width * this.pixelsPerMeter;
+                const heightInPixels = rectangle.height * this.pixelsPerMeter;
+                rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
+                rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
+                rectElement.setAttribute("width", widthInPixels.toString());
+                rectElement.setAttribute("height", heightInPixels.toString());
+                rectElement.setAttribute("fill", rectangle.color);
+                svgElement = rectElement;
+            } else if(shape instanceof Circle){
+                const circle = shape as Circle;
+
+                const circElement = document.createElementNS(svgNamespace, "circle");
+                const radiusInPixels = circle.radius * this.pixelsPerMeter;
         
+                circElement.setAttribute("cx", positionInPixels.x.toString());
+                circElement.setAttribute("cy", positionInPixels.y.toString());
+                circElement.setAttribute("r", radiusInPixels.toString());
+                circElement.setAttribute("fill", circle.color);
+                svgElement = circElement
+            }
             group.appendChild(svgElement);
         });
         const bodyPositionInPixels = this.meterCoordsToPixelCoords(body.position);
