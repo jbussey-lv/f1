@@ -4,7 +4,7 @@ import Rectangle from "../shapes/rectangle";
 import { mod } from "../../helper";
 import LeverArm from "../physics/lever-arm";
 
-export class Wheel extends Rectangle{
+export default class Wheel extends Rectangle{
     muStatic: number; // Coefficient of static friction
     constructor(
         position: Victor,

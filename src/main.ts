@@ -3,13 +3,18 @@ import World from './class/game/world.ts'
 // import { Controller } from './class/controller.ts';
 import { Car } from './class/car/car.ts';
 import { Controller } from './class/game/controller.ts';
+import { Cart } from './class/cart/cart.ts';
 
 
 const car = new Car();
 car.position.x = 0;
 car.position.y = 0;
 car.angle = 90 * Math.PI / 180; // 90 degrees in radians
-const world = new World([car]);
+
+const cart = new Cart();
+
+
+const world = new World([cart]);
 
 document.addEventListener("DOMContentLoaded", () => {
     const svgCanvas = document.getElementById("svgCanvas");

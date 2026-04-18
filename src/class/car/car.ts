@@ -3,7 +3,7 @@ import body from "../physics/body";
 import LeverArm from "../physics/lever-arm";
 import { Controller } from "../game/controller";
 import Rectangle from "../shapes/rectangle";
-import { Wheel } from "./wheel";
+import Wheel from "./wheel";
 import AbstractShape from "../shapes/abstract_shape";
 import Circle from "../shapes/circle";
 
