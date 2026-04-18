@@ -34,7 +34,11 @@ export class Cart extends body{
     }
 
     update(timeStep: number){
-        this.frontWheel.update(timeStep, this.tourque);
+        this.frontWheel.update(
+            timeStep,
+            this.controller?.throttle || 0,
+            this.controller?.brake || 0
+        );
     }
 
     get shapes(): Shape[] {
@@ -48,8 +52,7 @@ export class Cart extends body{
 
 
     get leverArms(): LeverArm[] {
-        return [
-        ];
+        return [];
     }
 
     
