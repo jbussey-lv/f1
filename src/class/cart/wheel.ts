@@ -3,7 +3,7 @@ import Circle from "../shapes/circle";
 
 export default class Wheel extends Circle{
 
-    angularVelolcity: number = 0;
+    angularVelocity: number = 0;
 
     constructor(radius: number, position: Victor, mass: number){
         super(
@@ -15,7 +15,7 @@ export default class Wheel extends Circle{
 
     update(timeStep: number, torque: number): void {
         const angularAccel = torque / this.momentOfInertia;
-        this.angularVelolcity += angularAccel * timeStep;
-        this.angle += this.angularVelolcity * timeStep;
+        this.angularVelocity += angularAccel * timeStep;
+        this.angle += this.angularVelocity * timeStep;
     }
 }

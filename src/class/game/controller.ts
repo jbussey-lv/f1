@@ -1,6 +1,7 @@
 export class Controller{
     gamepad: Gamepad;
     throttleButtonIndex: number = 7; // Right trigger
+    brakeButtonIndex: number = 6;
     steeringAxisIndex: number = 0; // Left stick horizontal
     deadZone: number = 0.03; // Dead zone for joystick
     constructor(gamepad: Gamepad) {
@@ -23,6 +24,10 @@ export class Controller{
         } else {
             return 0;
         }
+    }
+
+    get brake(): number {
+        return this.getButtonValue(this.brakeButtonIndex);
     }
 
     get steering() {

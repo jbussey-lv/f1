@@ -29,12 +29,42 @@ export class Cart extends body{
         super();
     }
 
-    get tourque(){
-        return this.controller?.throttle || 0;
+    get throttleTourque(): number{
+        const throttleMultiplier = 5
+        const throttle = this.controller?.throttle;
+        return throttle ? throttle * throttleMultiplier : 0;
     }
 
     update(timeStep: number){
-        this.frontWheel.update(timeStep, this.tourque);
+
+        const maxStaticBreakTorque = 12;
+        const maxKineticBrakeTorque = 8;
+        const maxThrottleTorque = 6;
+        const maxStaticAngularVelocity = 1.2;
+
+        const throttleSetting = this.controller?.throttle || 0;
+        const brakeSetting = this.controller?.brake || 0;
+
+        let wheelDirection = Math.sign(this.frontWheel.angularVelocity);
+
+        const throttleTorque = throttleSetting * maxThrottleTorque;
+        const staticBreakTorque = maxStaticBreakTorque * brakeSetting * -wheelDirection;
+        const kineticBreakTorque = maxKineticBrakeTorque * brakeSetting * -wheelDirection;
+        // wheel specific
+        let totalTorque = 0;
+
+        if(Math.abs(this.frontWheel.angularVelocity) < maxStaticAngularVelocity){
+            if(throttleTorque + staticBreakTorque < 0){
+                this.frontWheel.angularVelocity = 0;
+            } else {
+                totalTorque = throttleTorque + staticBreakTorque;
+            }
+        } else {
+            totalTorque = throttleTorque + kineticBreakTorque
+        }
+
+        this.frontWheel.angularVelocity += timeStep * totalTorque / this.frontWheel.momentOfInertia
+        this.frontWheel.angle += timeStep * this.frontWheel.angle;
     }
 
     get shapes(): Shape[] {
