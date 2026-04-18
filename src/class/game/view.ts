@@ -359,12 +359,10 @@ export default class View{
         const radius = radiusInPixels.toString();
         const strokeWidth = (radiusInPixels/10).toString();
         const group = this.createSVGElement("g");
-        group.setAttribute("transform", `translate(${posX}, ${posY})`);
         const circElement = this.createSVGElement("circle");
         circElement.setAttribute("cx", "0");
         circElement.setAttribute("cy", "0");
         circElement.setAttribute("r", radius);
-        circElement.setAttribute("angle", angleInDegrees.toString());
         circElement.setAttribute("fill", color);
         const lineElement = this.createSVGElement("line");
         lineElement.setAttribute("x1", "0");
@@ -375,6 +373,9 @@ export default class View{
         
         group.appendChild(circElement);
         group.appendChild(lineElement);
+        const rotate = `rotate(${angleInDegrees})`;
+        const translate = `translate(${posX}, ${posY})`
+        group.setAttribute("transform", `${translate}, ${rotate}`);
         return group
     }
 

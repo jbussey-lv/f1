@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Event listener for when a gamepad is connected
 window.addEventListener("gamepadconnected", (event) => {
   const gamepad = event.gamepad;
-  car.controller = new Controller(gamepad);
+  cart.controller = new Controller(gamepad);
   console.log(`Gamepad connected at index ${gamepad.index}: ${gamepad.id}.`);
 });
 
