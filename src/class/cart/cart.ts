@@ -29,21 +29,16 @@ export class Cart extends body{
         super();
     }
 
-    getWheelAngle(): number {
-        if (!this.controller) {
-            return 0;
-        } // Maximum steering angle in radians (30 degrees)
-        const angle = this.controller.steering;
-        return angle;
+    get tourque(){
+        return this.controller?.throttle || 0;
+    }
+
+    update(timeStep: number){
+        this.frontWheel.update(timeStep, this.tourque);
     }
 
     get shapes(): Shape[] {
 
-        const wheelAngle = this.getWheelAngle();
-
-        this.frontWheel.angle = wheelAngle;
-        this.backWheel.angle = wheelAngle;
-        
         return [
             this.chasis,
             this.frontWheel,

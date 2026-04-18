@@ -49,6 +49,8 @@ export class Car extends body{
         super();
     }
 
+    update(){}
+
     get shapes(): AbstractShape[] {
 
         this.frontLeftWheel.angle = this.leftWheelAngle;

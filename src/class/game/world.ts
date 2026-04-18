@@ -19,6 +19,7 @@ export default class World{
     }
 
     updateBody(body: Body){
+        body.update(this.timestepSeconds);
         let totalForce = new Victor(0, 0);
         let totalTorque = 0;
         for (const leverArm of body.leverArms) {

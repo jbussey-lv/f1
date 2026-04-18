@@ -101,6 +101,8 @@ export default abstract class Body {
         this._angle = mod(value, 2*Math.PI); // Keep angle within 0 to 2π
     }
 
+    abstract update(timeStep: number): void;
+
     abstract get leverArms(): LeverArm[];
 
     abstract get shapes(): AbstractShape[];
