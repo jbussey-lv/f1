@@ -5,8 +5,9 @@ export default class Wheel extends Circle{
 
     angularVelolcity: number = 0;
     minStaticAngularVelocity = 1;
-    maxStaticBrakeTorque = 45;
+    maxStaticBrakeTorque = 65;
     maxKineticBrakeTorque = 30;
+    maxFrictionTorque = 3;
     maxThrottleTorque = 15;
 
     constructor(radius: number, position: Victor, mass: number){
@@ -17,7 +18,7 @@ export default class Wheel extends Circle{
         )
     }
 
-    get AngluralDirection(): number {
+    get angluralDirection(): number {
         return this.angularVelolcity < 0 ? -1 : 1;
     }
 
@@ -30,7 +31,11 @@ export default class Wheel extends Circle{
                                this.maxStaticBrakeTorque :
                                this.maxKineticBrakeTorque;
 
-        return -this.AngluralDirection * maxBrakeTorque * brake;
+        return -this.angluralDirection * maxBrakeTorque * brake;
+    }
+
+    get frictionTorque(): number {
+        return -this.angluralDirection * this.maxFrictionTorque;
     }
 
     throttleTorque(throttle: number): number {
@@ -46,18 +51,19 @@ export default class Wheel extends Circle{
     update(timeStep: number, throttle: number, brake: number): void {
 
         const throttleTorque = this.throttleTorque(throttle);
-        const brakeTorque = this.brakeTorque(brake);
-        
-        const brakeTorqueWins = this.firstNumberWins(brakeTorque, throttleTorque)
-        const totalTorque = throttleTorque + brakeTorque;
+        const resistiveTorque = this.brakeTorque(brake)
+                              + this.frictionTorque;
+
+        const resistiveTorqueWins = this.firstNumberWins(resistiveTorque, throttleTorque)
+        const totalTorque = throttleTorque + resistiveTorque;
 
         const angularAccel = totalTorque / this.momentOfInertia;
-        
-        this.angularVelolcity += angularAccel * timeStep;
-        this.angle += this.angularVelolcity * timeStep;
 
-        if(brakeTorqueWins && this.insideStaticAngularVelocity){
+        if(resistiveTorqueWins && this.insideStaticAngularVelocity){
             this.angularVelolcity = 0;
+        } else {
+            this.angularVelolcity += angularAccel * timeStep;
+            this.angle += this.angularVelolcity * timeStep;
         }
     }
 }
