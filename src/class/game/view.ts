@@ -5,6 +5,7 @@ import Body from "../physics/body.js";
 import AbstractShape from "../shapes/abstract_shape.ts";
 import Rectangle from "../shapes/rectangle.ts";
 import Circle from "../shapes/circle.ts";
+import { radiansToDegrees } from "../../helper.ts";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -67,7 +68,7 @@ export default class View{
             positionInPixels,
             widthInPixels,
             heightInPixels,
-            angleInRadians * 180 / Math.PI,
+            radiansToDegrees(angleInRadians),
             fillColor
         );
     }
@@ -191,8 +192,6 @@ export default class View{
         line.setAttribute("stroke-width", strokeWidth.toString());
         this.svg.appendChild(line);
     }
-
-
     
     addArrowViaMeterCoords(
         startMeterCoords: Victor,
@@ -321,41 +320,70 @@ export default class View{
 
     rectangleToSVG(rectangle: Rectangle): SVGRectElement{
         const positionInPixels = this.meterCoordsToPixelCoords(rectangle.position)
-        const rectElement = document.createElementNS(svgNamespace, "rect");
         const widthInPixels = rectangle.width * this.pixelsPerMeter;
         const heightInPixels = rectangle.height * this.pixelsPerMeter;
-        rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
-        rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
-        rectElement.setAttribute("width", widthInPixels.toString());
-        rectElement.setAttribute("height", heightInPixels.toString());
-        rectElement.setAttribute("fill", rectangle.color);
-        return rectElement;
+
+        return this.getRectangleInPixels(
+            positionInPixels,
+            widthInPixels,
+            heightInPixels,
+            radiansToDegrees(rectangle.angle),
+            rectangle.color
+        )
     }
 
-    shapeToSvgElement(shape: AbstractShape, positionInPixels: Victor): SVGElement {
-        let svgElement: SVGElement = document.createElementNS(svgNamespace, "rect");;
-        if(shape instanceof Rectangle){
-            const rectangle = shape as Rectangle;
-            const rectElement = document.createElementNS(svgNamespace, "rect");
-            const widthInPixels = rectangle.width * this.pixelsPerMeter;
-            const heightInPixels = rectangle.height * this.pixelsPerMeter;
-            rectElement.setAttribute("x", (positionInPixels.x - widthInPixels / 2).toString());
-            rectElement.setAttribute("y", (positionInPixels.y - heightInPixels / 2).toString());
-            rectElement.setAttribute("width", widthInPixels.toString());
-            rectElement.setAttribute("height", heightInPixels.toString());
-            rectElement.setAttribute("fill", rectangle.color);
-            svgElement = rectElement;
-        } else if(shape instanceof Circle){
-            const circle = shape as Circle;
+    circleToSVG(circle: Circle): SVGCircleElement {
+        const positionInPixels = this.meterCoordsToPixelCoords(circle.position)
+        const radiusInPixels = circle.radius * this.pixelsPerMeter;
 
-            const circElement = document.createElementNS(svgNamespace, "circle");
-            const radiusInPixels = circle.radius * this.pixelsPerMeter;
-    
-            circElement.setAttribute("cx", positionInPixels.x.toString());
-            circElement.setAttribute("cy", positionInPixels.y.toString());
-            circElement.setAttribute("r", radiusInPixels.toString());
-            circElement.setAttribute("fill", circle.color);
-            svgElement = circElement
+        return this.getCircleInPixels(
+            positionInPixels,
+            radiusInPixels,
+            radiansToDegrees(circle.angle),
+            circle.color
+        )
+    }
+
+    createSVGElement(type: string): SVGElement {
+        return document.createElementNS(svgNamespace, type);
+    }
+
+    getCircleInPixels(
+        positionInPixels: Victor,
+        radiusInPixels: number,
+        angleInDegrees: number,
+        color: string
+    ): SVGElement {
+        const posX = positionInPixels.x.toString();
+        const posY = positionInPixels.y.toString();
+        const radius = radiusInPixels.toString();
+        const strokeWidth = (radiusInPixels/10).toString();
+        const group = this.createSVGElement("g");
+        group.setAttribute("transform", `translate(${posX}, ${posY})`);
+        const circElement = this.createSVGElement("circle");
+        circElement.setAttribute("cx", "0");
+        circElement.setAttribute("cy", "0");
+        circElement.setAttribute("r", radius);
+        circElement.setAttribute("angle", angleInDegrees.toString());
+        circElement.setAttribute("fill", color);
+        const lineElement = this.createSVGElement("line");
+        lineElement.setAttribute("x1", "0");
+        lineElement.setAttribute("y1", "0");
+        lineElement.setAttribute("x2", "0");
+        lineElement.setAttribute("y2", radius);
+        lineElement.setAttribute("style", `stroke:red;stroke-width:${strokeWidth}`);
+        
+        group.appendChild(circElement);
+        group.appendChild(lineElement);
+        return group
+    }
+
+    shapeToSvgElement(shape: AbstractShape): SVGElement {
+        let svgElement: SVGElement = document.createElementNS(svgNamespace, "rect");
+        if(shape instanceof Rectangle){
+            svgElement = this.rectangleToSVG(shape);
+        } else if(shape instanceof Circle){
+            svgElement = this.circleToSVG(shape);
         }
         return svgElement;
     }
@@ -363,9 +391,7 @@ export default class View{
     drawBody(body: Body) {
         const group = document.createElementNS(svgNamespace, "g");
         body.shapes.forEach((shape: AbstractShape) => {
-            let svgElement: SVGElement;
-            const positionInPixels = this.meterCoordsToPixelCoords(shape.position);
-            svgElement = this.shapeToSvgElement(shape, positionInPixels);
+            const svgElement = this.shapeToSvgElement(shape);
             group.appendChild(svgElement);
         });
         const bodyPositionInPixels = this.meterCoordsToPixelCoords(body.position);
