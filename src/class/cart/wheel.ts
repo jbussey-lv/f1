@@ -54,16 +54,17 @@ export default class Wheel extends Circle{
         const resistiveTorque = this.brakeTorque(brake)
                               + this.frictionTorque;
 
-        const resistiveTorqueWins = this.firstNumberWins(resistiveTorque, throttleTorque)
-        const totalTorque = throttleTorque + resistiveTorque;
-
-        const angularAccel = totalTorque / this.momentOfInertia;
+        const resistiveTorqueWins = this.firstNumberWins(resistiveTorque, throttleTorque);
 
         if(resistiveTorqueWins && this.insideStaticAngularVelocity){
             this.angularVelolcity = 0;
-        } else {
-            this.angularVelolcity += angularAccel * timeStep;
-            this.angle += this.angularVelolcity * timeStep;
+            return;
         }
+        
+        const totalTorque = throttleTorque + resistiveTorque;
+        const angularAccel = totalTorque / this.momentOfInertia;
+        
+        this.angularVelolcity += angularAccel * timeStep;
+        this.angle += this.angularVelolcity * timeStep;
     }
 }
