@@ -7,6 +7,7 @@ import LeverArm from "../physics/lever-arm";
 export default class Wheel extends Rectangle{
     muStatic: number; // Coefficient of static friction
     constructor(
+        body: Body,
         position: Victor,
         width: number = 0.5,
         radius: number = 0.5,
@@ -14,6 +15,7 @@ export default class Wheel extends Rectangle{
         muStatic: number = 500
     ) {
         super(
+            body,
             radius*2,
             width,
             position,
@@ -21,7 +23,7 @@ export default class Wheel extends Rectangle{
             0,
             "black"
         );
-        this.muStatic = muStatic; 
+        this.muStatic = muStatic;
     }
 
 
@@ -39,11 +41,11 @@ export default class Wheel extends Rectangle{
         );
     }
 
-    getLeverArm(body: Body): LeverArm {
-        const absoluteVelocity = this.getAbsoluteVelocity(body);
-        const absoluteAngle = this.getAbsoluteAngle(body);
+    getLeverArm(): LeverArm {
+        const absoluteVelocity = this.getAbsoluteVelocity();
+        const absoluteAngle = this.getAbsoluteAngle();
         const force = this.calculateForce(absoluteVelocity, absoluteAngle);
-        const arm = this.getArm(body);
+        const arm = this.getArm();
         return new LeverArm(arm, force);
     }
 

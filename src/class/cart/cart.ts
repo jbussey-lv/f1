@@ -8,36 +8,39 @@ import Wheel from "./wheel";
 
 export class Cart extends body{
 
-    controller: Controller | null = null;
+    controller: Controller;
     width: number = 6;
     height: number = 3;
 
-    chasis: Rectangle = new Rectangle(this.width, this.height, new Victor(0, 0), 1500, 0, "lightblue");
+    chasis: Rectangle = new Rectangle(this, this.width, this.height, new Victor(0, 0), 1500, 0, "lightblue");
 
     frontWheel = new Wheel(
+        this,
         1,
         new Victor(-2,-1),
         2
     );
     backWheel = new Wheel(
+        this,
         1,
         new Victor(2, -1),
         2
     );
 
-    constructor(){
+    constructor(controller: Controller){
         super();
+        this.controller = controller;
     }
 
     get tourque(){
-        return this.controller?.throttle || 0;
+        return this.controller.throttle || 0;
     }
 
     update(timeStep: number){
         this.frontWheel.update(
             timeStep,
-            this.controller?.throttle || 0,
-            this.controller?.brake || 0
+            this.controller.throttle || 0,
+            this.controller.brake || 0
         );
     }
 

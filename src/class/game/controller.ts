@@ -1,24 +1,32 @@
 export class Controller{
-    gamepad: Gamepad;
+    _gamepad: Gamepad | null;
     brakeButtonIndex: number = 6;
     throttleButtonIndex: number = 7; // Right trigger
     steeringAxisIndex: number = 0; // Left stick horizontal
     deadZone: number = 0.03; // Dead zone for joystick
-    constructor(gamepad: Gamepad) {
+    constructor(gamepad: Gamepad | null = null) {
+        this._gamepad = gamepad;
+        if(!gamepad){return}
         console.log("Controller initialized with gamepad:", gamepad.id);
-        this.gamepad = gamepad;
+        this._gamepad = gamepad;
+    }
+
+    set gamePad(gamepad: Gamepad){
+        this._gamepad = gamepad;
     }
 
     updateGamepad() {
-        const gamepad = navigator.getGamepads()[this.gamepad.index];
+        if(!this._gamepad){return}
+        const gamepad = navigator.getGamepads()[this._gamepad.index];
         if(gamepad){
-            this.gamepad = gamepad;
+            this._gamepad = gamepad;
         }
     }
 
     get throttle() {
+        if(!this._gamepad){return 0;}
         this.updateGamepad();
-        const throttleButton = this.gamepad.buttons[this.throttleButtonIndex];
+        const throttleButton = this._gamepad.buttons[this.throttleButtonIndex];
         if (throttleButton && Math.abs(throttleButton.value) > this.deadZone) {
             return throttleButton.value;
         } else {
@@ -27,12 +35,14 @@ export class Controller{
     }
 
     get brake() {
+        if(!this._gamepad){return 0;}
         return this.getButtonValue(this.brakeButtonIndex);
     }
 
-    get steering() {
+    get steering(): number {
+        if(!this._gamepad){return 0;}
         this.updateGamepad();
-        const steeringAxisIndex = this.gamepad.axes[this.steeringAxisIndex];
+        const steeringAxisIndex = this._gamepad.axes[this.steeringAxisIndex];
         if (steeringAxisIndex && Math.abs(steeringAxisIndex) > this.deadZone) {
             return -1* steeringAxisIndex;
         } else {
@@ -40,34 +50,35 @@ export class Controller{
         }
     }
 
-    get leftX() {
+    get leftX(): number {
         return this.getAxesValue(0);
     }
-    get leftY() {
+    get leftY(): number {
         return this.getAxesValue(1);
     }
-    get rightX() {
+    get rightX(): number {
         return this.getAxesValue(2);
     }
-    get rightY() {
+    get rightY(): number {
         return this.getAxesValue(3);
     }
-    get r1() {
+    get r1(): number {
         return this.getButtonValue(5);
     }
-    get r2() {
+    get r2(): number {
         return this.getButtonValue(7);
     }
-    get l1() {
+    get l1(): number {
         return this.getButtonValue(4);
     }
-    get l2() {
+    get l2(): number {
         return this.getButtonValue(6);
     }
 
-    getAxesValue(index: number) {
+    getAxesValue(index: number): number {
+        if(!this._gamepad){return 0;}
         this.updateGamepad();
-        const axis = this.gamepad.axes[index];
+        const axis = this._gamepad.axes[index];
         if (axis && Math.abs(axis) > this.deadZone) {
             return axis;
         } else {
@@ -75,9 +86,10 @@ export class Controller{
         }
     }
 
-    getButtonValue(index: number) {
+    getButtonValue(index: number): number {
+        if(!this._gamepad){return 0;}
         this.updateGamepad();
-        const button = this.gamepad.buttons[index];
+        const button = this._gamepad.buttons[index];
         return button ? button.value : 0;
     }
 

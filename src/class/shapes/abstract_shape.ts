@@ -2,6 +2,7 @@ import Victor from "victor";
 import Body from "../physics/body";
 
 export default abstract class AbstractShape{
+    body: Body;
     position: Victor;
     mass: number;
     angle: number;
@@ -9,11 +10,13 @@ export default abstract class AbstractShape{
     id: string = crypto.randomUUID();
 
     constructor(
+        body: Body,
         position: Victor, // refers to its center
         mass: number,
         angle: number,
         color: string
     ){
+        this.body = body;
         this.position = position;
         this.mass = mass;
         this.angle = angle;
@@ -24,32 +27,32 @@ export default abstract class AbstractShape{
 
     abstract get momentOfInertia(): number;
 
-    getRelativePositionUnrotated(body: Body): Victor {
-        return this.position.clone().subtract(body.com)
+    getRelativePositionUnrotated(): Victor {
+        return this.position.clone().subtract(this.body.com)
     }
 
-    getArm(body: Body): Victor {
-        return this.getRelativePositionUnrotated(body)
-                   .rotate(body.angle);
+    getArm(): Victor {
+        return this.getRelativePositionUnrotated()
+                   .rotate(this.body.angle);
     }
 
-    getAbsoluteAngle(body: Body): number {
-        return body.angle + this.angle;
+    getAbsoluteAngle(): number {
+        return this.body.angle + this.angle;
     }
 
-    getAbsolutePosition(body: Body): Victor {
-        return this.getArm(body)
-                   .add(body.position); // Rotate around body's angle and translate to body's position
+    getAbsolutePosition(): Victor {
+        return this.getArm()
+                   .add(this.body.position); // Rotate around body's angle and translate to body's position
     }
 
-    getTangentialVelocity(body: Body): Victor {
-        const arm = this.getArm(body);
+    getTangentialVelocity(): Victor {
+        const arm = this.getArm();
         return new Victor(-arm.y, arm.x) // Perpendicular vector
-            .multiplyScalar(body.angulerVelocity);
+            .multiplyScalar(this.body.angulerVelocity);
     }
 
-    getAbsoluteVelocity(body: Body): Victor {
-        return this.getTangentialVelocity(body).add(body.velocity);
+    getAbsoluteVelocity(): Victor {
+        return this.getTangentialVelocity().add(this.body.velocity);
     }
      
 }

@@ -1,10 +1,12 @@
 import Victor from "victor";
 import AbstractShape from "./abstract_shape";
+import Body from "../physics/body"
 
 export default class Circle extends AbstractShape{
     radius: number;
 
     constructor(
+        body: Body,
         radius: number, // vertical
         position: Victor, // refers to its center
         mass: number,
@@ -12,6 +14,7 @@ export default class Circle extends AbstractShape{
         color: string = "blue"
     ){
         super(
+            body,
             position,
             mass,
             angle,

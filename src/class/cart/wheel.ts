@@ -1,5 +1,6 @@
 import Victor from "victor";
 import Circle from "../shapes/circle";
+import Body from "../physics/body"
 
 export default class Wheel extends Circle{
 
@@ -10,8 +11,9 @@ export default class Wheel extends Circle{
     maxFrictionTorque = 3;
     maxThrottleTorque = 15;
 
-    constructor(radius: number, position: Victor, mass: number){
+    constructor(body: Body, radius: number, position: Victor, mass: number){
         super(
+            body,
             radius,
             position,
             mass

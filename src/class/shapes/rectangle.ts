@@ -1,11 +1,13 @@
 import Victor from "victor";
 import AbstractShape from "./abstract_shape";
+import Body from "../physics/body";
 
 export default class Rectangle extends AbstractShape{
     width: number;
     height: number;
 
     constructor(
+        body: Body,
         width: number, // horizontal
         height: number, // vertical
         position: Victor, // refers to its center
@@ -14,6 +16,7 @@ export default class Rectangle extends AbstractShape{
         color: string = "blue"
     ){
         super(
+            body,
             position,
             mass,
             angle,

@@ -9,27 +9,37 @@ import Circle from "../shapes/circle";
 
 export class Car extends body{
 
-    controller: Controller | null = null;
+    controller: Controller;
     maxSteeringAngle: number = Math.PI / 6; // 45 degrees in radians
     insideWheelSteeringMultiplier: number = 1.3; // Reduce the steering angle for the inside wheel  
     chasisWidth: number = 2;
     chasisLength: number = 6;
 
-    chasis: Rectangle = new Rectangle(this.chasisLength, this.chasisWidth, new Victor(0, 0), 1500, 0, "lightblue");
+    constructor(controller: Controller){
+        super()
+        this.controller = controller;
+    }
+
+    chasis: Rectangle = new Rectangle(this, this.chasisLength, this.chasisWidth, new Victor(0, 0), 1500, 0, "lightblue");
 
     frontLeftWheel = new Wheel(
+        this,
         new Victor(this.chasisLength / 3, this.chasisWidth / 2)
     );
     frontRightWheel = new Wheel(
+        this,
         new Victor(this.chasisLength / 3, this.chasisWidth / -2)
     );
     backLeftWheel = new Wheel(
+        this,
         new Victor(this.chasisLength / -3, this.chasisWidth / 2)
     );
     backRightWheel = new Wheel(
+        this,
         new Victor(this.chasisLength / -3, this.chasisWidth / -2)
     );
     circle1 = new Circle(
+        this,
         1.5,
         new Victor(5,0),
         1,
@@ -38,16 +48,13 @@ export class Car extends body{
     )
 
     circle2 = new Circle(
+        this,
         1.5,
         new Victor(-5,0),
         1,
         0,
         "green"
     )
-
-    constructor(){
-        super();
-    }
 
     update(){}
 
@@ -84,10 +91,10 @@ export class Car extends body{
         return [
             this.getThrottleLeverArm(),
             this.getDragLeverArm(),
-            this.frontLeftWheel.getLeverArm(this),
-            this.frontRightWheel.getLeverArm(this),
-            this.backLeftWheel.getLeverArm(this),
-            this.backRightWheel.getLeverArm(this)
+            this.frontLeftWheel.getLeverArm(),
+            this.frontRightWheel.getLeverArm(),
+            this.backLeftWheel.getLeverArm(),
+            this.backRightWheel.getLeverArm()
         ];
     }
 

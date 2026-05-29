@@ -45,6 +45,12 @@ export default abstract class Body {
         return this.velocity.clone().add(tangentialVelocity);
     }
 
+    getAbsolutePosition(position: Victor): Victor {
+        const unrotatePosition = this.position.clone().add(position);
+        const rotatedPosition = unrotatePosition.rotateBy(this.angle);
+        return rotatedPosition;
+    }
+
     calculateMass(): number {
         return this.shapes.reduce(
             (sum, rect) => sum + rect.mass,

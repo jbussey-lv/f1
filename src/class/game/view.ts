@@ -33,7 +33,7 @@ export default class View{
     }
 
     draw() {
-        const r = 15
+        const r = 2
         this.clearCanvas();
         const bodyPos = this.world.bodies[0].position.clone();
         this.meterCenter.x = clamp(this.meterCenter.x, bodyPos.x - r, bodyPos.x + r);
