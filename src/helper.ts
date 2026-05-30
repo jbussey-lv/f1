@@ -13,7 +13,10 @@ export function radiansToDegrees(radians: number) {
 export function mod(num: number, modulus: number): number {
     return ((num % modulus) + modulus) % modulus;
 }
-export function vectorMagAtAngle(vector: Victor, angle: number): number {
+export function vectorMagAtAng(vector: Victor, angle: number): number {
     const angleDiff = vector.horizontalAngle() - angle;
     return Math.cos(angleDiff) * vector.magnitude();
+}
+export function vectorFromMagAng(magnitude: number, angle: number): Victor {
+    return new Victor(magnitude, 0).rotate(angle);
 }
