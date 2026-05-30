@@ -10,20 +10,20 @@ export class Cart extends body{
 
     controller: Controller;
     width: number = 6;
-    height: number = 3;
+    height: number = 0.5;
 
     chasis: Rectangle = new Rectangle(this, this.width, this.height, new Victor(0, 0), 1500, 0, "lightblue");
 
-    frontWheel = new Wheel(
-        this,
-        1,
-        new Victor(-2,-1),
-        2
-    );
     backWheel = new Wheel(
         this,
         1,
-        new Victor(2, -1),
+        new Victor(-2,0),
+        2
+    );
+    frontWheel = new Wheel(
+        this,
+        1,
+        new Victor(2,0),
         2
     );
 
@@ -32,15 +32,15 @@ export class Cart extends body{
         this.controller = controller;
     }
 
-    get tourque(){
-        return this.controller.throttle || 0;
+    get throttleTourque(){
+        const engineMaxTorque = 100;
+        return this.controller.throttle * engineMaxTorque;
     }
 
     update(timeStep: number){
-        this.frontWheel.update(
+        this.backWheel.update(
             timeStep,
-            this.controller.throttle || 0,
-            this.controller.brake || 0
+            this.throttleTourque
         );
     }
 
@@ -55,7 +55,11 @@ export class Cart extends body{
 
 
     get leverArms(): LeverArm[] {
-        return [];
+
+        const oomph = this.controller.throttle * 5000;
+        return [
+            new LeverArm(new Victor(0,0), new Victor(oomph,0))
+        ];
     }
 
     

@@ -63,10 +63,10 @@ export default abstract class Body {
         let sumOfMassTimesX = 0;
         let sumOfMassTimesY = 0;
       
-        for (const rect of this.shapes) {
-          totalMass += rect.mass;
-          sumOfMassTimesX += rect.mass * rect.position.x;
-          sumOfMassTimesY += rect.mass * rect.position.y;
+        for (const shape of this.shapes) {
+          totalMass += shape.mass;
+          sumOfMassTimesX += shape.mass * shape.position.x;
+          sumOfMassTimesY += shape.mass * shape.position.y;
         }
       
         // Handle the case where total mass is zero to avoid division by zero

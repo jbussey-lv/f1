@@ -1,3 +1,5 @@
+import Victor from 'victor';
+
 import View from './class/game/view.ts'
 import World from './class/game/world.ts'
 // import { Controller } from './class/controller.ts';
@@ -6,10 +8,10 @@ import { Controller } from './class/game/controller.ts';
 import { Cart } from './class/cart/cart.ts';
 
 
-const car = new Car(new Controller());
-car.position.x = 0;
-car.position.y = 0;
-car.angle = 90 * Math.PI / 180; // 90 degrees in radians
+// const car = new Car(new Controller());
+// car.position.x = 0;
+// car.position.y = 0;
+// car.angle = 90 * Math.PI / 180; // 90 degrees in radians
 
 const cart = new Cart(new Controller());
 
@@ -31,9 +33,3 @@ window.addEventListener("gamepadconnected", (event) => {
   cart.controller.gamePad = gamepad;
   console.log(`Gamepad connected at index ${gamepad.index}: ${gamepad.id}.`);
 });
-
-
-
-
-
-

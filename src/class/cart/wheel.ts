@@ -10,6 +10,8 @@ export default class Wheel extends Circle{
     maxKineticBrakeTorque = 30;
     maxFrictionTorque = 3;
     maxThrottleTorque = 15;
+    _anchorPoint: Victor | null = null;
+    anchorSpringConstant = 1;
 
     constructor(body: Body, radius: number, position: Victor, mass: number){
         super(
@@ -20,53 +22,41 @@ export default class Wheel extends Circle{
         )
     }
 
+    get anchorPoint(): Victor {
+        if(this._anchorPoint === null){
+            this._anchorPoint = this.getAbsolutePosition();
+        }
+        return this._anchorPoint;
+    }
+
     get angluralDirection(): number {
         return this.angularVelolcity < 0 ? -1 : 1;
     }
 
-    get insideStaticAngularVelocity(): boolean {
-        return Math.abs(this.angularVelolcity) < this.minStaticAngularVelocity
+    get frictionSpringMag(): number {
+        return this.anchorPoint.x - this.getAbsolutePosition().x;
     }
 
-    brakeTorque(brake: number): number {
-        const maxBrakeTorque = this.insideStaticAngularVelocity ?
-                               this.maxStaticBrakeTorque :
-                               this.maxKineticBrakeTorque;
-
-        return -this.angluralDirection * maxBrakeTorque * brake;
+    get frictionSpringForceMag(): number {
+        return this.frictionSpringMag * this.anchorSpringConstant;
     }
 
     get frictionTorque(): number {
-        return -this.angluralDirection * this.maxFrictionTorque;
+        return this.frictionSpringForceMag * this.radius;
     }
 
-    throttleTorque(throttle: number): number {
-        return this.maxThrottleTorque * throttle;
-    }
 
-    firstNumberWins(firstNumber: number, secondNumber: number): boolean {
-        const oppositeSigns = firstNumber * secondNumber <= 0;
-        const firstBigger = Math.abs(firstNumber) > Math.abs(secondNumber);
-        return oppositeSigns && firstBigger;
-    }
+    update(timeStep: number, throttleTourque: number): void {
 
-    update(timeStep: number, throttle: number, brake: number): void {
+        const totalTorque = throttleTourque + this.frictionTorque;
 
-        const throttleTorque = this.throttleTorque(throttle);
-        const resistiveTorque = this.brakeTorque(brake)
-                              + this.frictionTorque;
-
-        const resistiveTorqueWins = this.firstNumberWins(resistiveTorque, throttleTorque);
-
-        if(resistiveTorqueWins && this.insideStaticAngularVelocity){
-            this.angularVelolcity = 0;
-            return;
-        }
-        
-        const totalTorque = throttleTorque + resistiveTorque;
         const angularAccel = totalTorque / this.momentOfInertia;
         
         this.angularVelolcity += angularAccel * timeStep;
-        this.angle += this.angularVelolcity * timeStep;
+        const angleDiff = this.angularVelolcity * timeStep;
+        const rollDist = angleDiff * this.radius;
+
+        this.anchorPoint.addScalarX(rollDist)
+        this.angle += angleDiff
     }
 }
