@@ -1,3 +1,5 @@
+import Victor from "victor";
+
 export function clamp(value: number, min: number, max: number) {
     return Math.max(min, Math.min(max, value));
 }
@@ -10,4 +12,8 @@ export function radiansToDegrees(radians: number) {
 }
 export function mod(num: number, modulus: number): number {
     return ((num % modulus) + modulus) % modulus;
+}
+export function vectorMagAtAngle(vector: Victor, angle: number): number {
+    const angleDiff = vector.horizontalAngle() - angle;
+    return Math.cos(angleDiff) * vector.magnitude();
 }
