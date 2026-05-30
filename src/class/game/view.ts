@@ -410,7 +410,7 @@ export default class View{
         //     "red"
         // )
         
-        const minVectorMagnitude = 0.01;
+        const minVectorMagnitude = 0.05;
         body.leverArms.forEach(leverArm => {
             if(leverArm.force.length() < minVectorMagnitude){
                 return;

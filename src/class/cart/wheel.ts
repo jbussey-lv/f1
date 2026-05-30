@@ -1,6 +1,7 @@
 import Victor from "victor";
 import Circle from "../shapes/circle";
 import Body from "../physics/body"
+import { FrictionMode } from "../physics/friction";
 import LeverArm from "../physics/lever-arm";
 
 export default class Wheel extends Circle{
@@ -15,12 +16,19 @@ export default class Wheel extends Circle{
     brakeMuKinetic = 1000;
     brakeMuStatic = 100;
 
+    maxStaticFriction = 100;
+
     angularAccelFloor = 0.01;
     angularVelocityFloor = 0.01;
 
     _anchorPoint: Victor | null = null;
     anchorSpringConstant = 1000;
     anchorSpringDampingCoef = -10
+
+    frictionMode: FrictionMode = FrictionMode.Static;
+    kineticSwitchSpeed: number = 1;
+    kineticFrictionForce = 10;
+
 
     constructor(body: Body, radius: number, position: Victor, mass: number){
         super(
@@ -38,6 +46,10 @@ export default class Wheel extends Circle{
         return this._anchorPoint;
     }
 
+    set anchorPoint(val: Victor){
+        this._anchorPoint = val;
+    }
+
     get angluralDirection(): number {
         if(this.angularVelolcity === 0){
             return 0;
@@ -49,19 +61,24 @@ export default class Wheel extends Circle{
         return this.anchorPoint.x - this.getAbsolutePosition().x;
     }
 
-    get frictionSpringForceMag(): number {
+    get frictionForceMag(): number {
+        if(this.frictionMode === FrictionMode.Static){
+            return this.frictionSpringMag * this.anchorSpringConstant;
+        } else {
+            this.kineticFrictionForce * this.contactPatchAbsoluteVelocity.x / Math.abs(this.contactPatchAbsoluteVelocity.x)
+        }
         return this.frictionSpringMag * this.anchorSpringConstant;
     }
 
     get frictionTorque(): number {
-        return -this.frictionSpringForceMag * this.radius // simple torque
+        return -this.frictionForceMag * this.radius // simple torque
                + this.angularVelolcity * this.anchorSpringDampingCoef;
     }
 
     get leverArm(): LeverArm {
         return new LeverArm(
             this.position,
-            new Victor(this.frictionSpringForceMag,0)
+            new Victor(this.frictionForceMag,0)
         )
     }
 
@@ -82,6 +99,9 @@ export default class Wheel extends Circle{
         const angularAccel = totalTorque / this.momentOfInertia;
         this.angularVelolcity += angularAccel * timeStep;
 
+        // apply general internal friction
+        this.angularVelolcity *= 0.9;
+
         // dead zone
         if(
             Math.abs(angularAccel) < this.angularAccelFloor
@@ -97,5 +117,33 @@ export default class Wheel extends Circle{
         this.anchorPoint.addScalarX(rollDist)
         this.angle += angleDiff
 
+        this.setFrictionMode();
     }
+
+    get contactPatchAbsoluteVelocity(): Victor {
+        return this.getAbsoluteVelocity()
+            .clone()
+            .addScalarX(this.angularVelolcity * this.radius);
+    }
+
+    setFrictionMode(){
+        // if we start in static
+        if(this.frictionMode === FrictionMode.Static){
+            // but we're pulling too hard
+            if(this.frictionForceMag > this.maxStaticFriction){
+                // switch
+                this.frictionMode = FrictionMode.Kinetic;
+                // this.color = "red";
+            }
+        // if we start kinetic
+        } else {
+            // but we've stopped slipping so fast
+            if(Math.abs(this.contactPatchAbsoluteVelocity.magnitude()) < this.kineticSwitchSpeed){
+                this.frictionMode = FrictionMode.Static;
+                this.anchorPoint = this.getAbsolutePosition().clone();
+                // this.color = "black";
+            }
+        }
+    }
+
 }

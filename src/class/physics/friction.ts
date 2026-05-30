@@ -19,3 +19,8 @@ export function getFrictionForce(
     response.y = response.y === -0 ? 0 : response.y;
     return response;
 }
+
+export const enum FrictionMode {
+    Static = "STATIC",
+    Kinetic = "KINETIC",
+  }

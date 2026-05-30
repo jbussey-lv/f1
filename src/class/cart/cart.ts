@@ -30,6 +30,7 @@ export class Cart extends body{
     constructor(controller: Controller){
         super();
         this.controller = controller;
+        this.position = new Victor(0, 1);
     }
 
     get throttleTourque(): number{
