@@ -32,15 +32,26 @@ export class Cart extends body{
         this.controller = controller;
     }
 
-    get throttleTourque(){
-        const engineMaxTorque = 100;
-        return this.controller.throttle * engineMaxTorque;
+    get throttleTourque(): number{
+        const engineMaxTorque = 10000;
+        return -this.controller.rightY * engineMaxTorque;
+    }
+
+    get brakeForce(): number {
+        const maxBrakeForce = 100;
+        return this.controller.brake * maxBrakeForce;
     }
 
     update(timeStep: number){
         this.backWheel.update(
             timeStep,
-            this.throttleTourque
+            this.throttleTourque,
+            this.brakeForce
+        );
+        this.frontWheel.update(
+            timeStep,
+            this.throttleTourque,
+            this.brakeForce
         );
     }
 
@@ -56,9 +67,10 @@ export class Cart extends body{
 
     get leverArms(): LeverArm[] {
 
-        const oomph = this.controller.throttle * 5000;
+        // const oomph = this.controller.throttle * 5000;
         return [
-            new LeverArm(new Victor(0,0), new Victor(oomph,0))
+            this.backWheel.leverArm,
+            this.frontWheel.leverArm
         ];
     }
 
