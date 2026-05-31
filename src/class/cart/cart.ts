@@ -9,33 +9,40 @@ import Wheel from "./wheel";
 export class Cart extends body{
 
     controller: Controller;
-    width: number = 6;
-    height: number = 0.5;
+    width: number = 4;
+    height: number = 0.4;
 
-    chasis: Rectangle = new Rectangle(this, this.width, this.height, new Victor(0, 0), 1500, 0, "lightblue");
+    chasis: Rectangle = new Rectangle(
+        this,
+        this.width,
+        this.height,
+        new Victor(0, 0),
+        1500,
+        0, 
+        "lightblue"
+    );
 
     backWheel = new Wheel(
         this,
-        1,
-        new Victor(-2,0),
-        2
+        0.3,
+        new Victor(-1.5,0),
+        20
     );
     frontWheel = new Wheel(
         this,
-        1,
-        new Victor(2,0),
-        2
+        0.3,
+        new Victor(1.5,0),
+        20
     );
 
     constructor(controller: Controller){
         super();
         this.controller = controller;
-        this.position = new Victor(0, 1);
+        this.position = new Victor(0, 0.3);
     }
 
-    get throttleTourque(): number{
-        const engineMaxTorque = 10000;
-        return -this.controller.rightY * engineMaxTorque;
+    get throttle(): number{
+        return -this.controller.rightY;
     }
 
     get brakeForce(): number {
@@ -46,13 +53,11 @@ export class Cart extends body{
     update(timeStep: number){
         this.backWheel.update(
             timeStep,
-            this.throttleTourque,
-            this.brakeForce
+            this.throttle
         );
         this.frontWheel.update(
             timeStep,
-            this.throttleTourque,
-            this.brakeForce
+            this.throttle
         );
     }
 

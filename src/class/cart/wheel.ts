@@ -6,6 +6,9 @@ import LeverArm from "../physics/lever-arm";
 
 export default class Wheel extends Circle{
 
+    muStatic: number = 1;
+    muKinetic: number = 0.7
+
     angularVelolcity: number = 0;
     minStaticAngularVelocity = 1;
     maxStaticBrakeTorque = 65;
@@ -26,8 +29,10 @@ export default class Wheel extends Circle{
     anchorSpringDampingCoef = -10
 
     frictionMode: FrictionMode = FrictionMode.Static;
-    kineticSwitchSpeed: number = 1;
-    kineticFrictionForce = 10;
+    kineticSwitchSpeed: number = 10;
+    kineticFrictionForce = 0.1;
+
+    internalFrictionAngularVelocityDamping = 0.9;
 
 
     constructor(body: Body, radius: number, position: Victor, mass: number){
@@ -62,15 +67,15 @@ export default class Wheel extends Circle{
     }
 
     get frictionForceMag(): number {
-        if(this.frictionMode === FrictionMode.Static){
-            return this.frictionSpringMag * this.anchorSpringConstant;
-        } else {
-            this.kineticFrictionForce * this.contactPatchAbsoluteVelocity.x / Math.abs(this.contactPatchAbsoluteVelocity.x)
-        }
+        // if(this.frictionMode === FrictionMode.Static){
+        //     return this.frictionSpringMag * this.anchorSpringConstant;
+        // } else {
+        //     this.kineticFrictionForce * this.contactPatchAbsoluteVelocity.x / Math.abs(this.contactPatchAbsoluteVelocity.x)
+        // }
         return this.frictionSpringMag * this.anchorSpringConstant;
     }
 
-    get frictionTorque(): number {
+    get roadFrictionTorque(): number {
         return -this.frictionForceMag * this.radius // simple torque
                + this.angularVelolcity * this.anchorSpringDampingCoef;
     }
@@ -89,35 +94,48 @@ export default class Wheel extends Circle{
                * this.angluralDirection * -1;
     }
 
-    update(timeStep: number, throttleTourque: number, brakeForce: number): void {
+    getThrottleTorque(throttle: number): number {
+        const engineMaxTorque = 10000;
+        return throttle * engineMaxTorque;
+    }
 
-        const totalTorque = throttleTourque 
-                          + this.frictionTorque
-                          + this.getBrakeTorque(brakeForce)
+    applyInternalFriction(): void{
+        this.angularVelolcity *= this.internalFrictionAngularVelocityDamping;
+    }
 
-        // euler integration
-        const angularAccel = totalTorque / this.momentOfInertia;
-        this.angularVelolcity += angularAccel * timeStep;
-
-        // apply general internal friction
-        this.angularVelolcity *= 0.9;
-
-        // dead zone
+    killWhenStill(angularAccel: number): void{
         if(
             Math.abs(angularAccel) < this.angularAccelFloor
             && Math.abs(this.angularVelolcity) < this.angularVelocityFloor    
         ){
             this.angularVelolcity = 0;
         }
+    }
 
-        // roll it
+    spinIt(timeStep: number): void{
         const angleDiff = this.angularVelolcity * timeStep;
         const rollDist = angleDiff * this.radius;
 
         this.anchorPoint.addScalarX(rollDist)
         this.angle += angleDiff
+    }
 
-        this.setFrictionMode();
+    update(timeStep: number, throttle: number): void {
+
+        const totalTorque = this.getThrottleTorque(throttle)
+                          + this.roadFrictionTorque;
+
+        // euler integration
+        const angularAccel = totalTorque / this.momentOfInertia;
+        this.angularVelolcity += angularAccel * timeStep;
+
+        this.applyInternalFriction();
+        
+        this.killWhenStill(angularAccel);
+
+        this.spinIt(timeStep);
+        
+        // this.setFrictionMode();
     }
 
     get contactPatchAbsoluteVelocity(): Victor {
