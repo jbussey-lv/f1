@@ -57,7 +57,7 @@ export class Cart extends body{
         );
         this.frontWheel.update(
             timeStep,
-            this.throttle
+            0
         );
     }
 
