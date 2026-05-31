@@ -7,7 +7,10 @@ import LeverArm from "../physics/lever-arm";
 export default class Wheel extends Circle{
 
     muStatic: number = 1;
-    muKinetic: number = 0.7
+    muKinetic: number = 0.7;
+    angularVelocityAve = 0;
+    angularVelocityAveDuration = 2;
+    angularVelocityAveCount = 50;
 
     angularVelolcity: number = 0;
     minStaticAngularVelocity = 1;
@@ -25,23 +28,35 @@ export default class Wheel extends Circle{
     angularVelocityFloor = 0.01;
 
     _anchorPoint: Victor | null = null;
-    anchorSpringConstant = 1000;
-    anchorSpringDampingCoef = -10
+    anchorSpringConstant = 1200;
+    anchorSpringDampingCoef = -45
 
     frictionMode: FrictionMode = FrictionMode.Static;
     kineticSwitchSpeed: number = 10;
     kineticFrictionForce = 0.1;
 
-    internalFrictionAngularVelocityDamping = 0.9;
+    internalFrictionAngularVelocityDamping = 0.99;
+
+    engineMaxTorque: number = 10000;
+    angularVelocityWall: number = 250;
+
+    engineLinked: boolean = false;
 
 
-    constructor(body: Body, radius: number, position: Victor, mass: number){
+    constructor(
+        body: Body, 
+        radius: number, 
+        position: Victor, 
+        mass: number,
+        engineLinked: boolean = false
+    ){
         super(
             body,
             radius,
             position,
             mass
         )
+        this.engineLinked = engineLinked;
     }
 
     get anchorPoint(): Victor {
@@ -94,9 +109,14 @@ export default class Wheel extends Circle{
                * this.angluralDirection * -1;
     }
 
-    getThrottleTorque(throttle: number): number {
-        const engineMaxTorque = 10000;
-        return throttle * engineMaxTorque;
+    getEngineTorque(throttle: number): number {
+        if(!this.engineLinked){return 0}
+        return throttle * this.engineMaxTorque
+
+ -(this.angularVelocityAve / this.angularVelocityWall) * this.engineMaxTorque;
+
+            //    - (this.angularVelolcity / this.angularVelocityWall) * this.engineMaxTorque;
+            //    + this.engineResistiveTorqueSlope * this.angularVelolcity;
     }
 
     applyInternalFriction(): void{
@@ -122,7 +142,7 @@ export default class Wheel extends Circle{
 
     update(timeStep: number, throttle: number): void {
 
-        const totalTorque = this.getThrottleTorque(throttle)
+        const totalTorque = this.getEngineTorque(throttle)
                           + this.roadFrictionTorque;
 
         // euler integration
@@ -134,7 +154,9 @@ export default class Wheel extends Circle{
         this.killWhenStill(angularAccel);
 
         this.spinIt(timeStep);
-        
+
+        this.updateAngularVelocityAve(timeStep)
+
         // this.setFrictionMode();
     }
 
@@ -142,6 +164,13 @@ export default class Wheel extends Circle{
         return this.getAbsoluteVelocity()
             .clone()
             .addScalarX(this.angularVelolcity * this.radius);
+    }
+
+    updateAngularVelocityAve(timeStep: number): void {
+        const count = this.angularVelocityAveDuration / timeStep;
+        let sum = this.angularVelocityAve * (count - 4)
+        sum += this.angularVelolcity * 4;
+        this.angularVelocityAve = sum / count;
     }
 
     setFrictionMode(){

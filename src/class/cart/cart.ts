@@ -26,7 +26,8 @@ export class Cart extends body{
         this,
         0.3,
         new Victor(-1.5,0),
-        20
+        20,
+        true
     );
     frontWheel = new Wheel(
         this,
