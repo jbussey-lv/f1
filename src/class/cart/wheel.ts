@@ -87,12 +87,30 @@ export default class Wheel extends Circle{
         // } else {
         //     this.kineticFrictionForce * this.contactPatchAbsoluteVelocity.x / Math.abs(this.contactPatchAbsoluteVelocity.x)
         // }
-        return this.frictionSpringMag * this.anchorSpringConstant;
+        const maxStaticFrictionForce = 15000;
+        const kineticFrictionForce = 1000;
+        const f = this.frictionSpringMag * this.anchorSpringConstant;
+
+        if(this.frictionMode == FrictionMode.Static){
+            this.color = "blue";
+            if(f > maxStaticFrictionForce ){
+                this.frictionMode = FrictionMode.Kinetic;
+            }
+            return f;
+        }
+        else{
+            this.color = "lightgreen"
+            this.anchorPoint = this.getAbsolutePosition();
+            if(this.contactPatchAbsoluteVelocity.magnitude() < 10){
+                this.frictionMode = FrictionMode.Static;
+            }
+            return kineticFrictionForce * this.angluralDirection;
+        }
     }
 
     get roadFrictionTorque(): number {
         return -this.frictionForceMag * this.radius // simple torque
-               + this.angularVelolcity * this.anchorSpringDampingCoef;
+            + this.angularVelolcity * this.anchorSpringDampingCoef;
     }
 
     get leverArm(): LeverArm {
