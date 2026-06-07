@@ -23,10 +23,10 @@ export default class World{
         let totalForce = new Vec(0, 0);
         let totalTorque = 0;
         for (const leverArm of body.leverArms) {
-            totalForce.add(leverArm.force);
+            totalForce = totalForce.add(leverArm.force);
             totalTorque += leverArm.torque;
         }
-        this.updateBodyLinear(body, totalForce);
+        // this.updateBodyLinear(body, totalForce);
         this.updateBodyAngular(body, totalTorque);
     }
 
