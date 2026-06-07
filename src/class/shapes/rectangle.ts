@@ -1,6 +1,6 @@
-import Victor from "victor";
 import AbstractShape from "./abstract_shape";
 import Body from "../physics/body";
+import Vec from "../../vec";
 
 export default class Rectangle extends AbstractShape{
     width: number;
@@ -10,7 +10,7 @@ export default class Rectangle extends AbstractShape{
         body: Body,
         width: number, // horizontal
         height: number, // vertical
-        position: Victor, // refers to its center
+        position: Vec, // refers to its center
         mass: number,
         angle: number = 0,
         color: string = "blue"
@@ -26,8 +26,8 @@ export default class Rectangle extends AbstractShape{
         this.height = height;
     }
 
-    get com(): Victor { // center of mass
-        return new Victor(this.width / 2, this.height / 2);
+    get com(): Vec { // center of mass
+        return new Vec(this.width / 2, this.height / 2);
     }
 
     get momentOfInertia(): number{

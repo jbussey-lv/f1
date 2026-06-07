@@ -1,19 +1,19 @@
-import Victor from "victor";
 import Body from "../physics/body";
 import Rectangle from "../shapes/rectangle";
 import { mod } from "../../helper";
 import LeverArm from "../physics/lever-arm";
+import Vec from "../../vec";
 
 export default class Wheel extends Rectangle{
     muStatic: number; // Coefficient of static friction
-    absoluteAnchorPosition: Victor;
+    absoluteAnchorPosition: Vec;
     staticSprintConstant: number = 1;
     angularVelocity: number = 0;
     radius: number;
     moment: number = 2;
     constructor(
         body: Body,
-        position: Victor,
+        position: Vec,
         width: number = 0.5,
         radius: number = 0.5,
         mass: number = 15,
@@ -33,15 +33,15 @@ export default class Wheel extends Rectangle{
         this.absoluteAnchorPosition = this.getAbsolutePosition()
     }
 
-    get frictionForce(): Victor {
-        return this.absoluteAnchorPosition.clone()
+    get frictionForce(): Vec {
+        return this.absoluteAnchorPosition
                    .subtract(this.getAbsolutePosition())
-                   .multiplyScalar(this.staticSprintConstant);
+                   .multiply(this.staticSprintConstant);
     }
 
-    // get frictionTorque(): number{
-    //     return this.frictionForce * this.radius;
-    // }
+    get frictionTorque(): number{
+        return this.frictionForce.mag * this.radius;
+    }
 
     update(timestep: number, throttleTorque: number){
 
@@ -50,7 +50,7 @@ export default class Wheel extends Rectangle{
         this.angularVelocity += angularAcceleration * timestep;
 
         const rollDistance = this.angularVelocity * this.radius * timestep;
-        const anchorPush = new Victor(rollDistance, 0).rotate(this.getAbsoluteAngle())
+        const anchorPush = new Vec(rollDistance, 0).rotateToAng(this.getAbsoluteAngle())
 
         this.absoluteAnchorPosition.add(anchorPush);
 
@@ -61,15 +61,15 @@ export default class Wheel extends Rectangle{
 
     }
 
-    calculateForce(absoluteVecity: Victor, absoluteAngle: number): Victor {
+    calculateForce(absoluteVecity: Vec, absoluteAngle: number): Vec {
         // Calculate the force based on the wheel's angle and car's speed
         // const speed = car.velocity.length();
         const normalizedWheelAngle = mod(absoluteAngle, 2 * Math.PI);
-        const slipAngle = absoluteVecity.angle() - normalizedWheelAngle
-        const forceMagnitude = -1 * this.muStatic * Math.sin(slipAngle) * absoluteVecity.length();
+        const slipAngle = absoluteVecity.ang - normalizedWheelAngle
+        const forceMagnitude = -1 * this.muStatic * Math.sin(slipAngle) * absoluteVecity.mag;
         const forceDirection = absoluteAngle + Math.PI / 2; // Perpendicular to the wheel's direction
         
-        return new Victor(
+        return new Vec(
             forceMagnitude * Math.cos(forceDirection),
             forceMagnitude * Math.sin(forceDirection)
         );
@@ -78,13 +78,13 @@ export default class Wheel extends Rectangle{
     get leverArm(): LeverArm {
         // const rollDistance = this.angularVelocity * this.radius * timestep;
         // const absoluteAngle = this.getAbsoluteAngle();
-        // const anchorPush = new Victor(rollDistance, 0).rotate(absoluteAngle)
+        // const anchorPush = new Vec(rollDistance, 0).rotate(absoluteAngle)
         // this.absoluteAnchorPosition = this.absoluteAnchorPosition.add(anchorPush);
         // const
         // const force = this.calculateForce(absoluteVelocity, absoluteAngle);
         // const arm = this.getArm();
         // return new LeverArm(arm, force);
-        return new LeverArm(this.getAbsolutePosition(), new Victor(1,0))
+        return new LeverArm(this.getAbsolutePosition(), new Vec(1,0))
     }
 
     

@@ -1,23 +1,23 @@
-import Victor from 'victor';
+import Vec from "../../vec";
 
 export function getFrictionForce(
-    velocity: Victor,
+    velocity: Vec,
     maxStaticFrictionSpeed: number,
     coefStaticFriction: number,
     coefKineticFriction: number,
     normalForceMagnitude: number
-): Victor {
-    const speed = velocity.magnitude();
-    let response: Victor = new Victor(0, 0);
+): Vec {
+    const speed = velocity.mag;
 
     const frictionMagnitude = speed < maxStaticFrictionSpeed ?
         coefStaticFriction * normalForceMagnitude * (speed / maxStaticFrictionSpeed) :
         coefKineticFriction * normalForceMagnitude;
         
-    response = velocity.clone().normalize().multiplyScalar(-frictionMagnitude);
-    response.x = response.x === -0 ? 0 : response.x;
-    response.y = response.y === -0 ? 0 : response.y;
-    return response;
+    const r = velocity.toUnit().multiply(-frictionMagnitude);
+    return new Vec(
+        r.x === -0 ? 0 : r.x,
+        r.y === -0 ? 0 : r.y
+    );
 }
 
 export const enum FrictionMode {

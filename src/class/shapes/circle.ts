@@ -1,6 +1,6 @@
-import Victor from "victor";
 import AbstractShape from "./abstract_shape";
 import Body from "../physics/body"
+import Vec from "../../vec";
 
 export default class Circle extends AbstractShape{
     radius: number;
@@ -8,7 +8,7 @@ export default class Circle extends AbstractShape{
     constructor(
         body: Body,
         radius: number, // vertical
-        position: Victor, // refers to its center
+        position: Vec, // refers to its center
         mass: number,
         angle: number = 0,
         color: string = "blue"
@@ -23,12 +23,12 @@ export default class Circle extends AbstractShape{
         this.radius = radius;
         this.position = position;
         this.mass = mass;
-        this.angle = angle || this.angle;
+        this.ang = angle || this.ang;
         this.color = color || this.color;
     }
 
-    get com(): Victor { // center of mass
-        return new Victor(this.radius, this.radius);
+    get com(): Vec { // center of mass
+        return new Vec(this.radius, this.radius);
     }
 
     get momentOfInertia(): number{

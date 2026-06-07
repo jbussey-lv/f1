@@ -1,4 +1,3 @@
-import Victor from "victor";
 import body from "../physics/body";
 import LeverArm from "../physics/lever-arm";
 import { Controller } from "../game/controller";
@@ -6,6 +5,7 @@ import Rectangle from "../shapes/rectangle";
 import Wheel from "./wheel";
 import AbstractShape from "../shapes/abstract_shape";
 import Circle from "../shapes/circle";
+import Vec from "../../vec";
 
 export class Car extends body{
 
@@ -20,28 +20,28 @@ export class Car extends body{
         this.controller = controller;
     }
 
-    chasis: Rectangle = new Rectangle(this, this.chasisLength, this.chasisWidth, new Victor(0, 0), 1500, 0, "lightblue");
+    chasis: Rectangle = new Rectangle(this, this.chasisLength, this.chasisWidth, new Vec(0, 0), 1500, 0, "lightblue");
 
     frontLeftWheel = new Wheel(
         this,
-        new Victor(this.chasisLength / 3, this.chasisWidth / 2)
+        new Vec(this.chasisLength / 3, this.chasisWidth / 2)
     );
     frontRightWheel = new Wheel(
         this,
-        new Victor(this.chasisLength / 3, this.chasisWidth / -2)
+        new Vec(this.chasisLength / 3, this.chasisWidth / -2)
     );
     backLeftWheel = new Wheel(
         this,
-        new Victor(this.chasisLength / -3, this.chasisWidth / 2)
+        new Vec(this.chasisLength / -3, this.chasisWidth / 2)
     );
     backRightWheel = new Wheel(
         this,
-        new Victor(this.chasisLength / -3, this.chasisWidth / -2)
+        new Vec(this.chasisLength / -3, this.chasisWidth / -2)
     );
     circle1 = new Circle(
         this,
         1.5,
-        new Victor(5,0),
+        new Vec(5,0),
         1,
         0,
         "green"
@@ -50,7 +50,7 @@ export class Car extends body{
     circle2 = new Circle(
         this,
         1.5,
-        new Victor(-5,0),
+        new Vec(-5,0),
         1,
         0,
         "green"
@@ -60,8 +60,8 @@ export class Car extends body{
 
     get shapes(): AbstractShape[] {
 
-        this.frontLeftWheel.angle = this.leftWheelAngle;
-        this.frontRightWheel.angle = this.rightWheelAngle;
+        this.frontLeftWheel.ang = this.leftWheelAngle;
+        this.frontRightWheel.ang = this.rightWheelAngle;
         return [
             this.chasis,
             this.frontLeftWheel,
@@ -91,32 +91,32 @@ export class Car extends body{
         return [
             this.getThrottleLeverArm(),
             this.getDragLeverArm(),
-            this.frontLeftWheel.getLeverArm(),
-            this.frontRightWheel.getLeverArm(),
-            this.backLeftWheel.getLeverArm(),
-            this.backRightWheel.getLeverArm()
+            this.frontLeftWheel.leverArm,
+            this.frontRightWheel.leverArm,
+            this.backLeftWheel.leverArm,
+            this.backRightWheel.leverArm
         ];
     }
 
     getSteeringLeverArm(): LeverArm {
         if (!this.controller) {
-            return new LeverArm(new Victor(0,0), new Victor(0,0));
+            return new LeverArm(new Vec(0,0), new Vec(0,0));
         }
         // Apply steering force at the rear of the car
-        const displacement = new Victor(0, 2).rotate(this.angle);
-        const forceMagnitude = this.controller.steering * 500 * this.velocity.magnitude();
+        const displacement = new Vec(0, 2).rotateByAng(this.angle);
+        const forceMagnitude = this.controller.steering * 500 * this.velocity.mag;
         return new LeverArm(
             displacement,
-            new Victor(0, forceMagnitude).rotate(this.angle + Math.PI / 2)
+            new Vec(0, forceMagnitude).rotateByAng(this.angle + Math.PI / 2)
         )
     }
 
     getAngularDragLeverArm(): LeverArm {
-        const displacement = new Victor(0, 2).rotate(this.angle);
+        const displacement = new Vec(0, 2).rotateByAng(this.angle);
         const angularDragMagnitude = -10000 * this.angulerVelocity * Math.abs(this.angulerVelocity);
         return new LeverArm(
             displacement,
-            new Victor(0, angularDragMagnitude).rotate(this.angle + Math.PI / 2)
+            new Vec(0, angularDragMagnitude).rotateByAng(this.angle + Math.PI / 2)
         )
     }
 
@@ -130,12 +130,12 @@ export class Car extends body{
 
     getDragLeverArm(): LeverArm {
         const dragCoefficient = 25;
-        const dragMagnitude = dragCoefficient * this.velocity.magnitude() ** 2;
-        const dragDirection = this.velocity.clone().normalize().rotate(Math.PI);
-        const force = dragDirection.multiplyScalar(dragMagnitude);
+        const dragMagnitude = dragCoefficient * this.velocity.mag ** 2;
+        const dragDirection = this.velocity.toUnit().rotateByAng(Math.PI);
+        const force = dragDirection.multiply(dragMagnitude);
 
         return new LeverArm(
-            new Victor(0,0),
+            new Vec(0,0),
             force
         )
     }
@@ -143,17 +143,17 @@ export class Car extends body{
     getThrottleLeverArm(): LeverArm {
 
         if (!this.controller) {
-            return new LeverArm(new Victor(0,0), new Victor(0,0));
+            return new LeverArm(new Vec(0,0), new Vec(0,0));
         }
 
-        const displacement = new Victor(0,0);
+        const displacement = new Vec(0,0);
 
         const forceMagnitude = this.controller.r2 * this.mass * 40;
 
-        // const location = this.position.clone().add(new Victor(this.dimensions.y * 0.25, 0));
+        // const location = this.position.clone().add(new Vec(this.dimensions.y * 0.25, 0));
         return new LeverArm(
             displacement,
-            new Victor(forceMagnitude, 0).rotate(this.angle)
+            new Vec(forceMagnitude, 0).rotateByAng(this.angle)
         )
     }
 

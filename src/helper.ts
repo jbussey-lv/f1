@@ -1,5 +1,3 @@
-import Victor from "victor";
-
 export function clamp(value: number, min: number, max: number) {
     return Math.max(min, Math.min(max, value));
 }
@@ -10,13 +8,9 @@ export function degreesToRadians(degrees: number) {
 export function radiansToDegrees(radians: number) {
     return radians * 180 / Math.PI;
 }
+export function cartesianRadiansToSvgDegrees(radians: number): number {
+    return -1 * radiansToDegrees(radians);
+}
 export function mod(num: number, modulus: number): number {
     return ((num % modulus) + modulus) % modulus;
-}
-export function vectorMagAtAng(vector: Victor, angle: number): number {
-    const angleDiff = vector.horizontalAngle() - angle;
-    return Math.cos(angleDiff) * vector.magnitude();
-}
-export function vectorFromMagAng(magnitude: number, angle: number): Victor {
-    return new Victor(magnitude, 0).rotate(angle);
 }

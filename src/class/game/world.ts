@@ -1,12 +1,12 @@
-import Victor from "victor";
+import Vec from "../../vec";
 import Body from "../physics/body";
 
 export default class World{
     timestepSeconds = 1/30; 
     timestepMilliseconds = this.timestepSeconds * 1000; // Convert to milliseconds
     bodies: Body[];
-    gravity: Victor = new Victor(0, 9.81); // m/s^2 downward
-    minVelocity = 2;
+    gravity: Vec = new Vec(0, 9.81); // m/s^2 downward
+    minVelocity = 0.5;
     minLinearAcceleration = 0.06;
 
     constructor(bodies: Body[] = []){
@@ -20,7 +20,7 @@ export default class World{
 
     updateBody(body: Body){
         body.update(this.timestepSeconds);
-        let totalForce = new Victor(0, 0);
+        let totalForce = new Vec(0, 0);
         let totalTorque = 0;
         for (const leverArm of body.leverArms) {
             totalForce.add(leverArm.force);
@@ -30,23 +30,23 @@ export default class World{
         this.updateBodyAngular(body, totalTorque);
     }
 
-    barelyMovingLinear(body: Body, linearAcceleration: Victor): boolean {
-        return body.velocity.magnitude() < this.minVelocity &&
-               linearAcceleration.magnitude() < this.minLinearAcceleration;
+    barelyMovingLinear(body: Body, linearAcceleration: Vec): boolean {
+        return body.velocity.mag < this.minVelocity &&
+               linearAcceleration.mag < this.minLinearAcceleration;
     }
 
-    updateBodyLinear(body: Body, totalForce: Victor){
+    updateBodyLinear(body: Body, totalForce: Vec){
 
-        const linearAcceleration = totalForce.divideScalar(body.mass);
+        const linearAcceleration = totalForce.divide(body.mass);
 
         if(this.barelyMovingLinear(body, linearAcceleration)){
-            body.velocity = new Victor(0,0);
+            body.velocity = new Vec(0,0);
             return
         }
 
-        const velocityDiff = linearAcceleration.clone().multiplyScalar(this.timestepSeconds);
+        const velocityDiff = linearAcceleration.multiply(this.timestepSeconds);
         body.velocity.add(velocityDiff);
-        const positionDiff = body.velocity.clone().multiplyScalar(this.timestepSeconds);
+        const positionDiff = body.velocity.multiply(this.timestepSeconds);
         body.position.add(positionDiff);
     }
 

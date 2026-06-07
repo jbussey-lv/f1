@@ -54,13 +54,15 @@ export class Controller{
         return this.getAxesValue(0);
     }
     get leftY(): number {
-        return this.getAxesValue(1);
+        // for some reason "up" comes back negative by default
+        return -1 * this.getAxesValue(1);
     }
     get rightX(): number {
         return this.getAxesValue(2);
     }
     get rightY(): number {
-        return this.getAxesValue(3);
+        // for some reason "up" comes back negative by default
+        return -1 * this.getAxesValue(3);
     }
     get r1(): number {
         return this.getButtonValue(5);

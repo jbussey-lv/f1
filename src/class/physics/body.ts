@@ -1,12 +1,12 @@
-import Victor from "victor";
 import LeverArm from "./lever-arm";
 import { mod } from "../../helper";
 import AbstractShape from "../shapes/abstract_shape";
+import Vec from "../../vec";
 
 export default abstract class Body {
 
-    position = new Victor(0, 0);
-    velocity = new Victor(0, 0);
+    position = new Vec(0, 0);
+    velocity = new Vec(0, 0);
     _angle = 0; // in radians
     angulerVelocity = 0; // in radians per second
     _mass: number | null = null; // in kg
@@ -25,29 +25,29 @@ export default abstract class Body {
         }
         return this._momentOfInertia;
     }
-    get com(): Victor { // center of mass
+    get com(): Vec { // center of mass
         return this.calculateCom();
     }
 
-    getArm(position: Victor): Victor {
-        return position.clone().subtract(this.com);
+    getArm(position: Vec): Vec {
+        return position.subtract(this.com);
     }
 
-    getTangentialVelocity(position: Victor): Victor {
+    getTangentialVelocity(position: Vec): Vec {
         const arm = this.getArm(position);
-        return arm.multiplyScalar(this.angulerVelocity)
-            .rotate(Math.PI / 2)
-            .rotate(this.angle);
+        return arm.multiply(this.angulerVelocity)
+            .rotateByAng(Math.PI / 2)
+            .rotateByAng(this.angle);
     }
 
-    getAbsoluteVelocity(position: Victor): Victor {
+    getAbsoluteVelocity(position: Vec): Vec {
         const tangentialVelocity = this.getTangentialVelocity(position);
-        return this.velocity.clone().add(tangentialVelocity);
+        return this.velocity.add(tangentialVelocity);
     }
 
-    getAbsolutePosition(position: Victor): Victor {
-        const unrotatePosition = this.position.clone().add(position);
-        const rotatedPosition = unrotatePosition.rotateBy(this.angle);
+    getAbsolutePosition(position: Vec): Vec {
+        const unrotatePosition = this.position.add(position);
+        const rotatedPosition = unrotatePosition.rotateByAng(this.angle);
         return rotatedPosition;
     }
 
@@ -58,7 +58,7 @@ export default abstract class Body {
         );
     }
 
-    calculateCom(): Victor { // center of mass
+    calculateCom(): Vec { // center of mass
         let totalMass = 0;
         let sumOfMassTimesX = 0;
         let sumOfMassTimesY = 0;
@@ -71,13 +71,13 @@ export default abstract class Body {
       
         // Handle the case where total mass is zero to avoid division by zero
         if (totalMass === 0) {
-          return new Victor(0,0); // Or throw an error, depending on desired behavior
+          return new Vec(0,0); // Or throw an error, depending on desired behavior
         }
       
         const xCenterOfMass = sumOfMassTimesX / totalMass;
         const yCenterOfMass = sumOfMassTimesY / totalMass;
       
-        return new Victor(xCenterOfMass, yCenterOfMass);
+        return new Vec(xCenterOfMass, yCenterOfMass);
     }
 
     calculateMomentOfInertia(): number {
@@ -86,7 +86,7 @@ export default abstract class Body {
 
         for (const shape of this.shapes) {
             // Distance from the rectangle's center to the body's center of mass
-            const distanceToCOM = shape.position.clone().subtract(com).magnitude();
+            const distanceToCOM = shape.position.subtract(com).mag;
 
             // Parallel axis theorem: I = I_center + m * d^2
             totalMomentOfInertia += shape.momentOfInertia + shape.mass * distanceToCOM ** 2;

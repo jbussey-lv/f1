@@ -1,17 +1,16 @@
-import Victor from "victor";
-import { clamp } from "../../helper.ts";
+import { clamp, radiansToDegrees } from "../../helper.ts";
 import World from "./world.js";
 import Body from "../physics/body.js";
 import AbstractShape from "../shapes/abstract_shape.ts";
 import Rectangle from "../shapes/rectangle.ts";
 import Circle from "../shapes/circle.ts";
-import { radiansToDegrees } from "../../helper.ts";
+import Vec from "../../vec.ts";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 export default class View{
-    pixelsPerMeter: number = 50;
-    meterCenter: Victor = new Victor(0, 0);
+    pixelsPerMeter: number = 100;
+    meterCenter: Vec = new Vec(0, 0);
     world: World;
     svg: HTMLElement;
     constructor(world: World, svg: HTMLElement) {
@@ -21,7 +20,7 @@ export default class View{
     }
 
     get pixelCenterCoords() {
-        return new Victor(
+        return new Vec(
             this.widthInPixels / 2,
             this.heightInPixels / 2
         );
@@ -35,9 +34,11 @@ export default class View{
     draw() {
         const r = 2
         this.clearCanvas();
-        const bodyPos = this.world.bodies[0].position.clone();
-        this.meterCenter.x = clamp(this.meterCenter.x, bodyPos.x - r, bodyPos.x + r);
-        this.meterCenter.y = clamp(this.meterCenter.y, bodyPos.y - r, bodyPos.y + r); 
+        const bodyPos = this.world.bodies[0].position;
+        this.meterCenter = new Vec(
+            clamp(this.meterCenter.x, bodyPos.x - r, bodyPos.x + r),
+            clamp(this.meterCenter.y, bodyPos.y - r, bodyPos.y + r)
+        )
         this.drawAxis();
         this.world.bodies.forEach(body => {
             this.drawBody(body);
@@ -55,7 +56,7 @@ export default class View{
     
 
     drawRectangleInMeters(
-        positionInMeters: Victor,
+        positionInMeters: Vec,
         widthInMeters: number,
         heightInMeters: number,
         angleInRadians: number,
@@ -74,7 +75,7 @@ export default class View{
     }
 
     drawDotInPixels(
-        positionInPixels: Victor,
+        positionInPixels: Vec,
         radiusInPixels: number,
         fillColor: string
     ) {
@@ -87,7 +88,7 @@ export default class View{
     }
 
     getRectangleInPixels(
-        positionInPixels: Victor,
+        positionInPixels: Vec,
         widthInPixels: number,
         heightInPixels: number,
         angleInDegrees: number,
@@ -106,7 +107,7 @@ export default class View{
     }
 
     drawRectangleInPixels(
-        positionInPixels: Victor,
+        positionInPixels: Vec,
         widthInPixels: number,
         heightInPixels: number,
         angleInDegrees: number,
@@ -138,15 +139,15 @@ export default class View{
         return this.heightInPixels / this.pixelsPerMeter;
     }
 
-    meterCoordsToPixelCoords(meterCoords: Victor) {
+    meterCoordsToPixelCoords(meterCoords: Vec) {
         const pixelCenterCoords = this.pixelCenterCoords;
         const xInPixels = pixelCenterCoords.x + (meterCoords.x-this.meterCenter.x) * this.pixelsPerMeter;
         const yInPixels = pixelCenterCoords.y - (meterCoords.y-this.meterCenter.y) * this.pixelsPerMeter;
-        return new Victor(xInPixels, yInPixels);
+        return new Vec(xInPixels, yInPixels);
     }
 
-    pixelCoordsToMeterCoords(pixelCoords: Victor) {
-        return new Victor(
+    pixelCoordsToMeterCoords(pixelCoords: Vec) {
+        return new Vec(
             (pixelCoords.x - this.widthInPixels / 2) / this.pixelsPerMeter + this.meterCenter.x,
             (pixelCoords.y - this.heightInPixels / 2) / this.pixelsPerMeter + this.meterCenter.y
         );
@@ -166,8 +167,8 @@ export default class View{
     }
 
     addLineViaMeterCoords(
-        startMeterCoords: Victor,
-        endMeterCoords: Victor,
+        startMeterCoords: Vec,
+        endMeterCoords: Vec,
         strokeColor: string = "black",
         strokeWidth: number = 1
     ) {
@@ -178,8 +179,8 @@ export default class View{
     }
 
     addLineViaPixelCoords(
-        startPixelCoords: Victor,
-        endPixelCoords: Victor,
+        startPixelCoords: Vec,
+        endPixelCoords: Vec,
         strokeColor = "black",
         strokeWidth = 1
     ) {
@@ -194,8 +195,8 @@ export default class View{
     }
     
     addArrowViaMeterCoords(
-        startMeterCoords: Victor,
-        endMeterCoords: Victor,
+        startMeterCoords: Vec,
+        endMeterCoords: Vec,
         strokeColor: string = "black",
         strokeWidth: number = 1
     ) {
@@ -205,8 +206,8 @@ export default class View{
     }
 
     addArrowViaPixelCoords(
-        startPixelCoords: Victor,
-        endPixelCoords: Victor,
+        startPixelCoords: Vec,
+        endPixelCoords: Vec,
         strokeColor = "black",
         strokeWidth = 1
     ) {
@@ -226,19 +227,19 @@ export default class View{
         strokeColor: string = "black",
         strokeWidth: number = 1
     ) {
-        const start = new Victor(this.minXInMeters, y);
-        const end = new Victor(this.maxXInMeters, y);
+        const start = new Vec(this.minXInMeters, y);
+        const end = new Vec(this.maxXInMeters, y);
         this.addLineViaMeterCoords(start, end, strokeColor, strokeWidth);
     }
 
     addVerticalLineAtXMeters(x: number, strokeColor = "black", strokeWidth = 1) {
-        const start = new Victor(x, this.minYInMeters);
-        const end = new Victor(x, this.maxYInMeters);
+        const start = new Vec(x, this.minYInMeters);
+        const end = new Vec(x, this.maxYInMeters);
         this.addLineViaMeterCoords(start, end, strokeColor, strokeWidth);
     }
 
     addLabelAtMeterCoords(
-        meterCoords: Victor,
+        meterCoords: Vec,
         text: string,
         color: string,
         boundHor: boolean=false,
@@ -249,7 +250,7 @@ export default class View{
     }
 
     addLabelAtPixelCoords(
-        pixelCoords: Victor,
+        pixelCoords: Vec,
         text: string,
         fillColor: string,
         boundHor: boolean=false,
@@ -297,7 +298,7 @@ export default class View{
         const width = (xInMeters === 0) ? 1 : 0.5;
         this.addVerticalLineAtXMeters(xInMeters, color, width);
         this.addLabelAtMeterCoords(
-            new Victor(xInMeters, 0),
+            new Vec(xInMeters, 0),
             xInMeters.toFixed(2),
             color,
             true,
@@ -310,7 +311,7 @@ export default class View{
         const width = (yInMeters === 0) ? 1 : 0.5;
         this.addHorizontalLineAtYMeters(yInMeters, color, width);
         this.addLabelAtMeterCoords(
-            new Victor(0, yInMeters),
+            new Vec(0, yInMeters),
             yInMeters.toFixed(2),
             color,
             true,
@@ -327,7 +328,7 @@ export default class View{
             positionInPixels,
             widthInPixels,
             heightInPixels,
-            radiansToDegrees(rectangle.angle),
+            radiansToDegrees(rectangle.ang),
             rectangle.color
         )
     }
@@ -339,7 +340,7 @@ export default class View{
         return this.getCircleInPixels(
             positionInPixels,
             radiusInPixels,
-            radiansToDegrees(circle.angle),
+            radiansToDegrees(circle.ang),
             circle.color
         )
     }
@@ -349,7 +350,7 @@ export default class View{
     }
 
     getCircleInPixels(
-        positionInPixels: Victor,
+        positionInPixels: Vec,
         radiusInPixels: number,
         angleInDegrees: number,
         color: string
@@ -412,12 +413,12 @@ export default class View{
         
         const minVectorMagnitude = 0.05;
         body.leverArms.forEach(leverArm => {
-            if(leverArm.force.length() < minVectorMagnitude){
+            if(leverArm.force.mag < minVectorMagnitude){
                 return;
             }
             // Draw force vector
-            const start = body.position.clone().add(leverArm.displacement);
-            const end = start.clone().add(leverArm.force.clone().divideScalar(2000)); // Scale down for visualization
+            const start = body.position.add(leverArm.displacement);
+            const end = start.add(leverArm.force.divide(2000)); // Scale down for visualization
             this.addArrowViaMeterCoords(start, end, "red", 2);
 
         });
