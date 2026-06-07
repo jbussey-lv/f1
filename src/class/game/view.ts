@@ -1,4 +1,4 @@
-import { clamp, radiansToDegrees } from "../../helper.ts";
+import { clamp, radiansToDegrees, cartesianRadiansToSvgDegrees } from "../../helper.ts";
 import World from "./world.js";
 import Body from "../physics/body.js";
 import AbstractShape from "../shapes/abstract_shape.ts";
@@ -340,7 +340,7 @@ export default class View{
         return this.getCircleInPixels(
             positionInPixels,
             radiusInPixels,
-            radiansToDegrees(circle.ang),
+            cartesianRadiansToSvgDegrees(circle.ang),
             circle.color
         )
     }

@@ -31,7 +31,7 @@ export default class Wheel extends Circle{
 
     get anchorPoint(): Vec {
         if(this._anchorPoint === null){
-            this._anchorPoint = this.getAbsolutePosition();
+            this._anchorPoint = this.absolutePosition;
         }
         return this._anchorPoint;
     }
@@ -41,22 +41,20 @@ export default class Wheel extends Circle{
     }
 
     get roadFrictionSpringMag(): number {
-        return this.anchorPoint.x - this.getAbsolutePosition().x;
+        return this.anchorPoint.x - this.absolutePosition.x;
     }
 
     get roadFrictionForceMag(): number {
-        return this.roadFrictionSpringMag * this.anchorSpringConstant;
+
+        const dampCoef = 8000;
+        const slipSpeed = this.slipSpeed;
+
+        return this.roadFrictionSpringMag * this.anchorSpringConstant
+               + slipSpeed * dampCoef;
     }
 
     get roadFrictionTorque(): number {
-
-        // const angVelAbs = Math.abs(this.angVel);
-
-        // const reducer = 1 - angVelAbs / (angVelAbs + 1)
-        return this.roadFrictionForceMag * this.radius 
-            //    * reducer;
-        // simple torque
-            //    + this.angVel * roadFrictionDamping;
+        return this.roadFrictionForceMag * this.radius
     }
 
     get leverArm(): LeverArm {
@@ -70,6 +68,12 @@ export default class Wheel extends Circle{
         if(!this.engineLinked){return 0}
 
         return throttle * this.engineMaxTorque;
+    }
+
+    get slipSpeed(): number {
+        const rollVelocity = this.angVel * this.radius;
+        const linearVelocity = this.absoluteVelocity.x;
+        return linearVelocity - rollVelocity;
     }
 
     update(timeStep: number, throttle: number): void {
@@ -87,7 +91,7 @@ export default class Wheel extends Circle{
         // update state
         this.angVel = angVel;
         this.ang = ang
-        this.anchorPoint.addX(rollDist)
+        this.anchorPoint = this.anchorPoint.addX(rollDist)
     }
 
     

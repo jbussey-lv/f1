@@ -45,9 +45,9 @@ export default class World{
         }
 
         const velocityDiff = linearAcceleration.multiply(this.timestepSeconds);
-        body.velocity.add(velocityDiff);
+        body.velocity = body.velocity.add(velocityDiff);
         const positionDiff = body.velocity.multiply(this.timestepSeconds);
-        body.position.add(positionDiff);
+        body.position = body.velocity.add(positionDiff);
     }
 
     updateBodyAngular(body: Body, totalTorque: number){

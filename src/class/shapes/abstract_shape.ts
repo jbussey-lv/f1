@@ -28,32 +28,32 @@ export default abstract class AbstractShape{
 
     abstract get momentOfInertia(): number;
 
-    getRelativePositionUnrotated(): Vec {
+    get relativePositionUnrotated(): Vec {
         return this.position.subtract(this.body.com)
     }
 
-    getArm(): Vec {
-        return this.getRelativePositionUnrotated()
+    get arm(): Vec {
+        return this.relativePositionUnrotated
                    .rotateByAng(this.body.angle);
     }
 
-    getAbsoluteAngle(): number {
+    get absoluteAngle(): number {
         return this.body.angle + this.ang;
     }
 
-    getAbsolutePosition(): Vec {
-        return this.getArm()
+    get absolutePosition(): Vec {
+        return this.arm
                    .add(this.body.position); // Rotate around body's angle and translate to body's position
     }
 
-    getTangentialVelocity(): Vec {
-        const arm = this.getArm();
+    get tangentialVelocity(): Vec {
+        const arm = this.arm;
         return new Vec(-arm.y, arm.x) // Perpendicular vector
             .multiply(this.body.angulerVelocity);
     }
 
-    getAbsoluteVelocity(): Vec {
-        return this.getTangentialVelocity().add(this.body.velocity);
+    get absoluteVelocity(): Vec {
+        return this.tangentialVelocity.add(this.body.velocity);
     }
 
     get ang(): number {

@@ -1,11 +1,8 @@
-import Victor from 'victor';
-
 import View from './class/game/view.ts'
 import World from './class/game/world.ts'
-// import { Controller } from './class/controller.ts';
-import { Car } from './class/car/car.ts';
 import { Controller } from './class/game/controller.ts';
 import { Cart } from './class/cart/cart.ts';
+import Vec from './vec.ts';
 
 
 // const car = new Car(new Controller());
@@ -13,7 +10,10 @@ import { Cart } from './class/cart/cart.ts';
 // car.position.y = 0;
 // car.angle = 90 * Math.PI / 180; // 90 degrees in radians
 
-const cart = new Cart(new Controller());
+const cart = new Cart(
+  new Controller(),
+  new Vec(1, 0.3)
+);
 
 
 const world = new World([cart]);

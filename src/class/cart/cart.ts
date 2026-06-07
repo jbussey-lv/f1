@@ -38,10 +38,10 @@ export class Cart extends body{
     //     false
     // );
 
-    constructor(controller: Controller){
+    constructor(controller: Controller, position: Vec){
         super();
         this.controller = controller;
-        this.position = new Vec(0, 0.3);
+        this.position = position;
     }
 
     get throttle(): number{
