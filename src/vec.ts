@@ -8,6 +8,10 @@ export default class Vec {
         this.y = y;
     }
 
+    static zero(): Vec {
+        return new Vec(0,0);
+    }
+
     static fromXandY(x: number, y: number): Vec {
         return new Vec(x, y);
     }
@@ -64,6 +68,11 @@ export default class Vec {
         return new Vec(this.x, this.y + y);
     }
 
+    addMultiple(vec: Vec, coef: number): Vec{
+        const multiple = vec.multiply(coef)
+        return this.add(multiple);
+    }
+
     subtract(vec: Vec): Vec {
         return new Vec(this.x - vec.x, this.y - vec.y);
     }
@@ -90,6 +99,13 @@ export default class Vec {
         return (u.x * v.y) - (u.y * v.x);
     }
 
+    equal(v: Vec): boolean {
+        return this.x === v.x && this.y === v.y;
+    }
+
+    different(v: Vec): boolean{
+        return !this.equal(v);
+    }
 
 
 }

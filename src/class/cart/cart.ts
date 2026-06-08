@@ -30,13 +30,6 @@ export class Cart extends body{
         1000,
         true
     );
-    // frontWheel = new Wheel(
-    //     this,
-    //     0.3,
-    //     new Vec(1.5,0),
-    //     20,
-    //     false
-    // );
 
     constructor(controller: Controller, position: Vec){
         super();
@@ -48,41 +41,26 @@ export class Cart extends body{
         return this.controller.rightY;
     }
 
-    get brakeForce(): number {
-        const maxBrakeForce = 100;
-        return this.controller.brake * maxBrakeForce;
-    }
-
     update(timeStep: number){
         this.backWheel.update(
             timeStep,
             this.throttle
-        );
-        // this.frontWheel.update(
-        //     timeStep,
-        //     0
-        // );
+        )
     }
 
     get shapes(): Shape[] {
 
         return [
             this.chasis,
-            // this.frontWheel,
-            this.backWheel,
+            this.backWheel
         ]
     }
 
 
     get leverArms(): LeverArm[] {
-
-        // const oomph = this.controller.throttle * 5000;
         return [
             this.backWheel.leverArm,
-            // this.frontWheel.leverArm
         ];
     }
-
-    
 
 }

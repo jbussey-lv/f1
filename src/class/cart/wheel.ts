@@ -12,6 +12,8 @@ export default class Wheel extends Circle{
     engineLinked: boolean;
 
     _anchorPoint: Vec | null  = null;
+    leverArm: LeverArm = LeverArm.zero();
+    roadFrictionForceMag = 0;
 
     constructor(
         body: Body, 
@@ -44,30 +46,26 @@ export default class Wheel extends Circle{
         return this.anchorPoint.x - this.absolutePosition.x;
     }
 
-    get roadFrictionForceMag(): number {
+    setRoadFrictionForceMag(): void {
 
         const dampCoef = 8000;
         const slipSpeed = this.slipSpeed;
 
-        return this.roadFrictionSpringMag * this.anchorSpringConstant
-               + slipSpeed * dampCoef;
+        const basicSpringFactor = this.roadFrictionSpringMag * this.anchorSpringConstant;
+        const dampingFactor = slipSpeed * dampCoef;
+
+        this.roadFrictionForceMag = basicSpringFactor + dampingFactor;
     }
 
-    get roadFrictionTorque(): number {
+    get roadFrictionTorque(){
         return this.roadFrictionForceMag * this.radius
-    }
-
-    get leverArm(): LeverArm {
-        return new LeverArm(
-            this.position,
-            new Vec(this.roadFrictionForceMag,0)
-        )
     }
 
     getEngineTorque(throttle: number): number {
         if(!this.engineLinked){return 0}
 
-        return throttle * this.engineMaxTorque;
+        return throttle * this.engineMaxTorque
+               -this.angVel * 40;
     }
 
     get slipSpeed(): number {
@@ -77,6 +75,8 @@ export default class Wheel extends Circle{
     }
 
     update(timeStep: number, throttle: number): void {
+
+        this.setRoadFrictionForceMag();
 
         const totalTorque = this.getEngineTorque(throttle)
                           + this.roadFrictionTorque;
@@ -92,6 +92,12 @@ export default class Wheel extends Circle{
         this.angVel = angVel;
         this.ang = ang
         this.anchorPoint = this.anchorPoint.addX(rollDist)
+
+        // set leverArm
+        this.leverArm = new LeverArm(
+            this.position,
+            new Vec(this.roadFrictionForceMag,0)
+        )
     }
 
     
